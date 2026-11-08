@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Reviews | EstatePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <div class="header-links">
+        <a href="/admin-dashboard.html">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Manage Reviews</h1>
+    <p class="subtitle">Approve or reject reviews written by clients.</p>
+
+    <div id="message"></div>
+    <div class="table-box" id="tableBox">Loading...</div>
+</div>
+
+<script src="/admin.js"></script>
+<script>
+
+    const box = document.getElementById("tableBox");
+
+    async function loadReviews() {
+
+        try {
+
+            const reviews = await getList("/review/admin/all");
+
+            if (reviews.length === 0) {
+                showEmpty(box, "No reviews found.");
+                return;
+            }
+
+            buildTable(box,
+                ["Agent", "Client", "Rating", "Comment", "Date", "Status", "Actions"],
+                reviews,
+                function (row, review) {
+
+                    makeCell(row, review.agentEmail);
+                    makeCell(row, review.clientEmail);
+                    makeCell(row, review.rating + " / 5");
+                    makeCell(row, review.comment);
+                    makeCell(row, review.date);
+                    makeBadgeCell(row, review.status);
+
+                    const actionCell = document.createElement("td");
+
+                    // Only pending reviews can be approved or rejected
+                    if (review.status === "PENDING") {
+
+                        actionCell.appendChild(makeButton("Approve", "green-btn", function () {
+                            updateStatus(review.reviewId, "APPROVED");
+                        }));
+
+                        actionCell.appendChild(makeButton("Reject", "red-btn", function () {
+                            updateStatus(review.reviewId, "REJECTED");
+                        }));
+
+                    } else {
+                        actionCell.textContent = "-";
+                    }
+
+                    row.appendChild(actionCell);
+                });
+
+        } catch (error) {
+            showEmpty(box, error.message);
+        }
+    }
+
+    async function updateStatus(reviewId, status) {
+
+        if (!confirm("Do you want to mark this review as " + status + "?")) {
+            return;
+        }
+
+        const result = await postForm("/review/admin/update-status", {
+            reviewId: reviewId,
+            status: status
+        });
+
+        showMessage(result, result.includes("successfully"));
+        loadReviews();
+    }
+
+    loadReviews();
+
+</script>
+</body>
+</html>
