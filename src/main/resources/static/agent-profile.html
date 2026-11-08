@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Profile | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f4;
+            color: #26352c;
+        }
+
+        header {
+            background: #123c2b;
+            color: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d8b56d;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #123c2b;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #1d704c;
+        }
+
+        textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #1d704c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #145638;
+        }
+
+        #message {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        @media(max-width: 600px) {
+            .form-card {
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro</span></div>
+    <a href="/agent-dashboard.html">← Back to Dashboard</a>
+</header>
+
+<div class="container">
+
+    <div class="form-card">
+
+        <h1>Create Your Agent Profile</h1>
+        <p class="subtitle">
+            Complete your professional details to connect with potential clients.
+        </p>
+
+        <form id="agentProfileForm">
+
+            <div class="form-group">
+                <label>Agency Name</label>
+                <input type="text" name="agencyName"
+                       placeholder="Enter your agency name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Specialization</label>
+                <input type="text" name="specialization"
+                       placeholder="e.g. Residential, Commercial" required>
+            </div>
+
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" name="location"
+                       placeholder="Enter your working location" required>
+            </div>
+
+            <div class="form-group">
+                <label>Experience (Years)</label>
+                <input type="number" name="experienceYears"
+                       min="0" placeholder="Enter experience years" required>
+            </div>
+
+            <div class="form-group">
+                <label>Professional Description</label>
+                <textarea name="description"
+                          placeholder="Tell clients about your experience and services..."
+                          required></textarea>
+            </div>
+
+            <button type="submit">Create Agent Profile</button>
+
+        </form>
+
+        <p id="message"></p>
+
+    </div>
+
+</div>
+
+<script>
+    document.getElementById("agentProfileForm")
+        .addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const form = this;
+            const message = document.getElementById("message");
+
+            const formData = new URLSearchParams(
+                new FormData(form)
+            );
+
+            try {
+                const response = await fetch("/agent/create-profile", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: formData
+                });
+
+                const result = await response.text();
+
+                message.textContent = result;
+
+                if (result.includes("successfully")) {
+                    message.style.color = "green";
+                    form.reset();
+                } else {
+                    message.style.color = "red";
+                }
+
+            } catch (error) {
+                message.textContent = "Something went wrong. Please try again.";
+                message.style.color = "red";
+            }
+        });
+</script>
+
+</body>
+</html>

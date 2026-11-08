@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #123c2d;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .detail {
+            padding: 18px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail:last-child {
+            border-bottom: none;
+        }
+
+        .detail label {
+            display: block;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .detail p {
+            font-size: 16px;
+            font-weight: 600;
+            color: #18352b;
+            overflow-wrap: anywhere;
+        }
+
+        #message {
+            text-align: center;
+            padding: 25px;
+            color: #777;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <a href="/agent-dashboard.html">← Dashboard</a>
+</header>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <h1>My Agent Profile</h1>
+
+        <p class="subtitle">
+            View your professional information.
+        </p>
+
+        <div id="profileDetails">
+            <p id="message">Loading your profile...</p>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    async function loadProfile() {
+
+        const container = document.getElementById("profileDetails");
+
+        try {
+
+            const response = await fetch("/agent/my-profile");
+
+            const result = await response.json();
+
+            if (!response.ok || !result.agentId) {
+                container.innerHTML =
+                    '<p id="message">Agent profile not found.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+
+            <div class="detail">
+                <label>Agent ID</label>
+                <p>${escapeHTML(result.agentId)}</p>
+            </div>
+
+            <div class="detail">
+                <label>Email</label>
+                <p>${escapeHTML(result.email)}</p>
+            </div>
+
+            <div class="detail">
+                <label>Agency Name</label>
+                <p>${escapeHTML(result.agencyName)}</p>
+            </div>
+
+            <div class="detail">
+                <label>Specialization</label>
+                <p>${escapeHTML(result.specialization)}</p>
+            </div>
+
+            <div class="detail">
+                <label>Location</label>
+                <p>${escapeHTML(result.location)}</p>
+            </div>
+
+            <div class="detail">
+                <label>Experience</label>
+                <p>${escapeHTML(result.experienceYears)} Years</p>
+            </div>
+
+            <div class="detail">
+                <label>Professional Description</label>
+                <p>${escapeHTML(result.description)}</p>
+            </div>
+
+            <div class="detail">
+                <label>Rating</label>
+                <p>${escapeHTML(result.rating)}</p>
+            </div>
+
+        `;
+
+        } catch (error) {
+
+            container.innerHTML =
+                '<p id="message">Unable to load profile. Please try again.</p>';
+
+        }
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, function(character) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[character];
+        });
+    }
+
+    loadProfile();
+
+</script>
+
+</body>
+</html>
