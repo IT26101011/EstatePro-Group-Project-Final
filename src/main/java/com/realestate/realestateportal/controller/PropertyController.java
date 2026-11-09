@@ -1,3 +1,4 @@
+
 package com.realestate.realestateportal.controller;
 
 import com.realestate.realestateportal.model.Property;
@@ -14,10 +15,14 @@ import java.util.List;
 @RequestMapping("/property")
 public class PropertyController {
 
-    private final PropertyService propertyService =
-            new PropertyService();
+    private final PropertyService propertyService;
 
-    // Create Property
+    // Constructor Dependency Injection
+    public PropertyController(PropertyService propertyService) {
+        this.propertyService = propertyService;
+    }
+
+    // CREATE PROPERTY
     @PostMapping("/create")
     public String createProperty(
             @ModelAttribute Property property,
@@ -34,7 +39,7 @@ public class PropertyController {
         return propertyService.createProperty(property);
     }
 
-    // Get Properties Of Logged-in Agent
+    // GET PROPERTIES OF LOGGED-IN AGENT
     @GetMapping("/my-properties")
     public Object getMyProperties(HttpSession session) {
 
@@ -50,7 +55,7 @@ public class PropertyController {
         return properties;
     }
 
-    // Get All Properties
+    // GET ALL PROPERTIES
     @GetMapping("/all")
     public Object getAllProperties(HttpSession session) {
 
@@ -63,7 +68,50 @@ public class PropertyController {
         return propertyService.getAllProperties();
     }
 
-    // Update Property
+    // FILTER PROPERTIES BY MULTIPLE CRITERIA
+    @GetMapping("/filter")
+    public Object filterProperties(
+
+            @RequestParam(required = false) String propertyType,
+
+            @RequestParam(required = false) String listingType,
+
+            @RequestParam(required = false) String location,
+
+            @RequestParam(required = false) Double minPrice,
+
+            @RequestParam(required = false) Double maxPrice,
+
+            @RequestParam(required = false) Integer bedrooms,
+
+            @RequestParam(required = false) Integer bathrooms,
+
+            @RequestParam(required = false) Double minArea,
+
+            @RequestParam(required = false) Double maxArea,
+
+            HttpSession session) {
+
+        User user = (User) session.getAttribute("loggedInUser");
+
+        if (user == null) {
+            return "Please login first.";
+        }
+
+        return propertyService.filterProperties(
+                propertyType,
+                listingType,
+                location,
+                minPrice,
+                maxPrice,
+                bedrooms,
+                bathrooms,
+                minArea,
+                maxArea
+        );
+    }
+
+    // UPDATE PROPERTY
     @PostMapping("/update")
     public String updateProperty(
             @ModelAttribute Property property,
@@ -79,7 +127,9 @@ public class PropertyController {
                 propertyService.getPropertyById(property.getPropertyId());
 
         if (existingProperty == null ||
+                existingProperty.getAgentEmail() == null ||
                 !existingProperty.getAgentEmail().equalsIgnoreCase(user.getEmail())) {
+
             return "Property not found or access denied.";
         }
 
@@ -88,7 +138,7 @@ public class PropertyController {
         return propertyService.updateProperty(property);
     }
 
-    // Delete Property
+    // DELETE PROPERTY
     @PostMapping("/delete")
     public String deleteProperty(
             @RequestParam("propertyId") String propertyId,
@@ -104,7 +154,9 @@ public class PropertyController {
                 propertyService.getPropertyById(propertyId);
 
         if (existingProperty == null ||
+                existingProperty.getAgentEmail() == null ||
                 !existingProperty.getAgentEmail().equalsIgnoreCase(user.getEmail())) {
+
             return "Property not found or access denied.";
         }
 
