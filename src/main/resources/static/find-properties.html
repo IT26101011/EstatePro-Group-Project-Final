@@ -1,0 +1,637 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Properties | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        .back-btn {
+            background: #d5b56b;
+            color: #123c2d;
+            padding: 10px 20px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .container {
+            padding: 45px 7%;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .properties {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .property-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+        }
+
+        .property-card h3 {
+            color: #123c2d;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .property-card p {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .price {
+            color: #1d704c !important;
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 15px;
+        }
+
+        .book-btn {
+            width: 100%;
+            padding: 13px;
+            margin-top: 15px;
+            background: #123c2d;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .book-btn:hover {
+            background: #1d704c;
+        }
+
+        .message {
+            color: #777;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+
+        /* BOOKING MODAL */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 14px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h2 {
+            color: #123c2d;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: #1d704c;
+        }
+
+        .form-group textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        /* AM PM TIME SELECTOR */
+
+        .time-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .time-selector select {
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 13px;
+            background: #123c2d;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #1d704c;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        @media(max-width: 500px) {
+            header {
+                padding: 18px 5%;
+            }
+
+            .container {
+                padding: 35px 5%;
+            }
+
+            .modal {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <a href="/client-dashboard.html" class="back-btn">Back to Dashboard</a>
+</header>
+
+<div class="container">
+
+    <h1>Find Properties</h1>
+    <p class="subtitle">Explore available properties and book your appointment.</p>
+
+    <div id="properties" class="properties">
+        <p class="message">Loading properties...</p>
+    </div>
+
+    <p id="message" class="message"></p>
+
+</div>
+
+<!-- APPOINTMENT BOOKING MODAL -->
+
+<div class="modal-overlay" id="bookingModal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+            <h2>Book Appointment</h2>
+            <button type="button" class="close-btn" onclick="closeBookingModal()">&times;</button>
+        </div>
+
+        <form id="bookingForm">
+
+            <input type="hidden" id="propertyId">
+
+            <div class="form-group">
+                <label>Property</label>
+                <input type="text" id="propertyTitle" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Agent Email</label>
+                <input type="text" id="agentEmail" readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Appointment Date</label>
+                <input type="date" id="appointmentDate" required>
+            </div>
+
+            <div class="form-group">
+                <label>Appointment Time</label>
+
+                <div class="time-selector">
+
+                    <select id="timeHour" required>
+                        <option value="">Hour</option>
+                    </select>
+
+                    <select id="timeMinute" required>
+                        <option value="">Minute</option>
+                    </select>
+
+                    <select id="timePeriod" required>
+                        <option value="">AM / PM</option>
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                    </select>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Message (Optional)</label>
+                <textarea id="appointmentMessage"
+                          placeholder="Write a message to the agent..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn" id="bookButton">
+                Confirm Appointment
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    let selectedProperty = null;
+
+    // CREATE TIME OPTIONS
+
+    const hourSelect = document.getElementById("timeHour");
+    const minuteSelect = document.getElementById("timeMinute");
+
+    for (let i = 1; i <= 12; i++) {
+
+        const value = String(i).padStart(2, "0");
+
+        hourSelect.add(new Option(value, value));
+
+    }
+
+    for (let i = 0; i < 60; i++) {
+
+        const value = String(i).padStart(2, "0");
+
+        minuteSelect.add(new Option(value, value));
+
+    }
+
+
+    // LOAD ALL PROPERTIES
+
+    async function loadProperties() {
+
+        const container = document.getElementById("properties");
+        const message = document.getElementById("message");
+
+        try {
+
+            const response = await fetch("/property/all");
+
+            if (response.status === 401 || response.status === 403) {
+                window.location.href = "/login.html";
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Unable to load properties.");
+            }
+
+            const properties = await response.json();
+
+            container.innerHTML = "";
+
+            if (properties.length === 0) {
+                message.textContent = "No properties are currently available.";
+                return;
+            }
+
+            message.textContent = "";
+
+            properties.forEach(property => {
+
+                const card = document.createElement("div");
+                card.className = "property-card";
+
+                card.innerHTML = `
+                    <h3>${escapeHTML(property.title)}</h3>
+
+                    <p><strong>Type:</strong> ${escapeHTML(property.propertyType)}</p>
+
+                    <p><strong>Listing:</strong> ${escapeHTML(property.listingType)}</p>
+
+                    <p><strong>Location:</strong> ${escapeHTML(property.location)}</p>
+
+                    <p><strong>Bedrooms:</strong> ${property.bedrooms}</p>
+
+                    <p><strong>Bathrooms:</strong> ${property.bathrooms}</p>
+
+                    <p><strong>Area:</strong> ${property.area} sq.ft</p>
+
+                    <p class="price">
+                        LKR ${Number(property.price).toLocaleString()}
+                    </p>
+
+                    <p>${escapeHTML(property.description)}</p>
+
+                    <button class="book-btn" type="button">
+                        Book Appointment
+                    </button>
+                `;
+
+                card.querySelector("button").addEventListener("click", () => {
+                    openBookingModal(property);
+                });
+
+                container.appendChild(card);
+
+            });
+
+        } catch (error) {
+
+            container.innerHTML = "";
+            message.textContent = error.message;
+
+        }
+    }
+
+
+    // OPEN BOOKING MODAL
+
+    function openBookingModal(property) {
+
+        selectedProperty = property;
+
+        document.getElementById("propertyId").value = property.propertyId;
+        document.getElementById("propertyTitle").value = property.title;
+        document.getElementById("agentEmail").value = property.agentEmail;
+
+        const today = new Date();
+
+        const localDate = new Date(
+            today.getTime() - today.getTimezoneOffset() * 60000
+        ).toISOString().split("T")[0];
+
+        document.getElementById("appointmentDate").min = localDate;
+        document.getElementById("appointmentDate").value = "";
+
+        hourSelect.value = "";
+        minuteSelect.value = "";
+        document.getElementById("timePeriod").value = "";
+
+        document.getElementById("appointmentMessage").value = "";
+
+        document.getElementById("bookingModal").classList.add("active");
+
+    }
+
+
+    // CLOSE BOOKING MODAL
+
+    function closeBookingModal() {
+
+        document.getElementById("bookingModal").classList.remove("active");
+
+        selectedProperty = null;
+
+    }
+
+
+    // CONVERT AM / PM TO 24-HOUR FORMAT
+
+    function convertTo24Hour(hour, minute, period) {
+
+        let convertedHour = parseInt(hour);
+
+        if (period === "AM" && convertedHour === 12) {
+            convertedHour = 0;
+        }
+
+        if (period === "PM" && convertedHour !== 12) {
+            convertedHour += 12;
+        }
+
+        return String(convertedHour).padStart(2, "0") + ":" + minute;
+
+    }
+
+
+    // BOOK APPOINTMENT
+
+    document.getElementById("bookingForm").addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        if (!selectedProperty) {
+            return;
+        }
+
+        const date = document.getElementById("appointmentDate").value;
+        const hour = hourSelect.value;
+        const minute = minuteSelect.value;
+        const period = document.getElementById("timePeriod").value;
+
+        if (!date || !hour || !minute || !period) {
+            alert("Please select a valid appointment date and time.");
+            return;
+        }
+
+        // Convert selected time to 24-hour format
+
+        const appointmentTime = convertTo24Hour(hour, minute, period);
+
+        // Check whether selected date and time are in the future
+
+        const selectedDateTime = new Date(date + "T" + appointmentTime + ":00");
+        const currentDateTime = new Date();
+
+        if (selectedDateTime <= currentDateTime) {
+
+            alert("Please select a future date and time.");
+
+            return;
+        }
+
+        const bookButton = document.getElementById("bookButton");
+
+        bookButton.disabled = true;
+        bookButton.textContent = "Booking...";
+
+        try {
+
+            const formData = new URLSearchParams();
+
+            formData.append("propertyId", selectedProperty.propertyId);
+            formData.append("agentEmail", selectedProperty.agentEmail);
+
+            formData.append("appointmentDate", date);
+
+            formData.append("appointmentTime", appointmentTime);
+
+            formData.append(
+                "message",
+                document.getElementById("appointmentMessage").value
+            );
+
+            const response = await fetch("/appointment/book", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+
+                body: formData
+
+            });
+
+            const result = await response.text();
+
+            alert(result);
+
+            if (response.ok && result.toLowerCase().includes("success")) {
+                closeBookingModal();
+            }
+
+        } catch (error) {
+
+            alert("Error booking appointment: " + error.message);
+
+        } finally {
+
+            bookButton.disabled = false;
+            bookButton.textContent = "Confirm Appointment";
+
+        }
+
+    });
+
+
+    // ESCAPE HTML
+
+    function escapeHTML(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, function(character) {
+
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[character];
+
+        });
+
+    }
+
+
+    // CLOSE MODAL WHEN CLICKING OUTSIDE
+
+    document.getElementById("bookingModal").addEventListener("click", function(event) {
+
+        if (event.target === this) {
+            closeBookingModal();
+        }
+
+    });
+
+
+    // LOAD PROPERTIES
+
+    loadProperties();
+
+</script>
+
+</body>
+</html>
