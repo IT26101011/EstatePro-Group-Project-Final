@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        .back {
+            color: #123c2d;
+            background: #d5b56b;
+            padding: 10px 20px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 55px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .profile-item {
+            padding: 18px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-item label {
+            display: block;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .profile-item p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .role {
+            display: inline-block;
+            background: #e7f1eb;
+            color: #123c2d;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .message {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        .error {
+            color: #c0392b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+
+        .edit-profile-btn {
+            display: inline-block;
+            padding: 11px 24px;
+            background: #c9a227;
+            color: #171717;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #c9a227;
+            transition: all 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background: #171717;
+            color: #c9a227;
+            border-color: #171717;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .profile-card {
+                padding: 25px;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+
+    <a href="/client-dashboard.html" class="back">
+        Back to Dashboard
+    </a>
+
+    <a href="/edit-profile.html" class="edit-profile-btn">
+        ✎ Edit Profile
+    </a>
+</header>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <h1>My Profile</h1>
+
+        <p class="subtitle">
+            View your personal account information.
+        </p>
+
+        <div id="loading" class="message">
+            Loading your profile...
+        </div>
+
+        <div id="profileDetails" style="display:none;">
+
+            <div class="profile-item">
+                <label>Full Name</label>
+                <p id="fullName"></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Email Address</label>
+                <p id="email"></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Phone Number</label>
+                <p id="phone"></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Account Role</label>
+                <p><span class="role" id="role"></span></p>
+            </div>
+
+        </div>
+
+        <div id="errorMessage" class="message error"
+             style="display:none;">
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    async function loadProfile() {
+
+        try {
+
+            const response = await fetch("/profile");
+
+            const data = await response.json();
+
+            document.getElementById("loading").style.display = "none";
+
+            if (!response.ok || data.error) {
+                document.getElementById("errorMessage").textContent =
+                    data.error || "Unable to load profile.";
+
+                document.getElementById("errorMessage").style.display = "block";
+                return;
+            }
+
+            document.getElementById("fullName").textContent = data.fullName;
+            document.getElementById("email").textContent = data.email;
+            document.getElementById("phone").textContent = data.phone;
+            document.getElementById("role").textContent = data.role;
+
+            document.getElementById("profileDetails").style.display = "block";
+
+        } catch (error) {
+
+            document.getElementById("loading").style.display = "none";
+
+            document.getElementById("errorMessage").textContent =
+                "Something went wrong. Please try again.";
+
+            document.getElementById("errorMessage").style.display = "block";
+        }
+    }
+
+    loadProfile();
+
+</script>
+
+</body>
+</html>

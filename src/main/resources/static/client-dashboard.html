@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Client Dashboard | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        .logout {
+            background: #d5b56b;
+            color: #123c2d;
+            padding: 10px 22px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .logout:hover {
+            background: white;
+        }
+
+        .container {
+            padding: 55px 7%;
+        }
+
+        .welcome {
+            margin-bottom: 35px;
+        }
+
+        .welcome h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .welcome p {
+            color: #777;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 22px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            color: #123c2d;
+        }
+
+        .card p {
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .card a,
+        .card button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 11px 20px;
+            background: #123c2d;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.3s ease;
+        }
+
+        .card a:hover,
+        .card button:hover {
+            background: #d5b56b;
+            color: #123c2d;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 35px 5%;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <a href="/logout" class="logout">Logout</a>
+</header>
+
+<div class="container">
+
+
+    <div class="welcome">
+        <h1>Welcome to EstatePro!</h1>
+        <p>Your personal real estate client dashboard.</p>
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Find Agents</h3>
+            <p>Discover professional real estate agents and explore their profiles.</p>
+
+            <button type="button">
+                Explore Agents
+            </button>
+        </div>
+
+        <div class="card">
+            <h3>Find Properties</h3>
+            <p>Explore available properties and find your dream home.</p>
+
+            <a href="/find-properties.html">
+                View Properties
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>My Appointments</h3>
+            <p>View and manage your real estate appointments.</p>
+
+            <a href="/my-appointments.html">
+                View Appointments
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>My Reviews</h3>
+            <p>Share your experience and review real estate agents.</p>
+
+            <a href="/my-reviews.html">
+                My Reviews
+            </a>
+        </div>
+
+        <div class="card">
+            <h3>My Profile</h3>
+            <p>View and manage your personal account information.</p>
+
+            <a href="/profile.html">
+                View Profile
+            </a>
+        </div>
+
+    </div>
+
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+</body>
+</html>
