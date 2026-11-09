@@ -2,6 +2,7 @@ package com.realestate.realestateportal.controller;
 
 import com.realestate.realestateportal.model.Review;
 import com.realestate.realestateportal.model.Appointment;
+import com.realestate.realestateportal.model.User;
 
 import com.realestate.realestateportal.service.ReviewService;
 import com.realestate.realestateportal.service.AppointmentService;
@@ -16,7 +17,6 @@ import java.util.ArrayList;
 @RestController
 @RequestMapping("/review")
 public class ReviewController {
-
 
     private final ReviewService reviewService = new ReviewService();
 
@@ -234,6 +234,4 @@ public class ReviewController {
 
         return "Review status updated successfully. Agent rating updated.";
     }
-
-
 }
