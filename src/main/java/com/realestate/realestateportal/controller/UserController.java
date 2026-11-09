@@ -13,11 +13,10 @@ import java.util.LinkedHashMap;
 @RestController
 public class UserController {
 
-
     private final UserService userService = new UserService();
 
     // User Registration
-    @PostMapping("/register")
+    @PostMapping("/register")//responsible for creating a new user."C" of CRUD
     public String registerUser(
             @ModelAttribute User user,
             @RequestParam("confirmPassword") String confirmPassword) {
@@ -64,7 +63,7 @@ public class UserController {
 
     // View Own Profile
     @GetMapping("/profile")
-    public Object getMyProfile(HttpSession session) {
+    public Object getMyProfile(HttpSession session) {//Responsible for read an existing user."R"of CRUD
 
         User loggedInUser = (User) session.getAttribute("loggedInUser");
 
@@ -87,7 +86,7 @@ public class UserController {
 
     // Update Own Profile
     @PostMapping("/profile/update")
-    public String updateMyProfile(
+    public String updateMyProfile(//Responsible for updating an existing profile."U"of CRUD
             @RequestParam("fullName") String fullName,
             @RequestParam("phone") String phone,
             @RequestParam(value = "currentPassword", required = false) String currentPassword,
@@ -117,9 +116,32 @@ public class UserController {
         return result;
     }
 
-// =====================================
+    // Delete Own Account
+    @PostMapping("/profile/delete")
+    public String deleteOwnAccount(
+            @RequestParam("currentPassword") String currentPassword,
+            HttpSession session) {
+
+        User loggedInUser =
+                (User) session.getAttribute("loggedInUser");
+
+        if (loggedInUser == null) {
+            return "Please login to delete your account.";
+        }
+
+        String result = userService.deleteOwnAccount(
+                loggedInUser.getEmail(),
+                currentPassword
+        );
+
+        if (result.equals("Account deleted successfully!")) {
+            session.invalidate();
+        }
+
+        return result;
+    }
+
 // ADMIN MANAGEMENT
-// =====================================
 
     // View All Users
     @GetMapping("/admin/users")
