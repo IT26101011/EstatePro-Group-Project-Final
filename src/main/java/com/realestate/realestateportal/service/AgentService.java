@@ -195,22 +195,34 @@ public class AgentService extends BaseAgentService {
             return "Agent not found.";
         }
 
-        // Get agent email before deletion
+        // Get related User account before deletion
         String agentEmail = agent.getEmail();
+        User user = userRepository.findByEmail(agentEmail);
 
-        // Delete related User account first
-        boolean userDeleted = userRepository.deleteUser(agentEmail);
-
-        if (!userDeleted) {
-            return "Failed to delete user account.";
+        // Delete Agent profile first
+        if (!agentRepository.deleteAgent(agentId)) {
+            return "Failed to delete agent profile.";
         }
 
-        // Delete Agent profile
-        if (agentRepository.deleteAgent(agentId)) {
+        // Delete related User account
+        if (user != null && !userRepository.deleteUser(agentEmail)) {
+
+            // Restore Agent profile if User deletion fails
+            boolean restored = agentRepository.saveAgent(agent);
             rebuildAgentBST();
-            return "Agent profile and user account deleted successfully!";
+
+            if (restored) {
+                return "User account deletion failed. Agent profile was restored.";
+            }
+
+            return "User account deletion failed and agent profile restoration also failed.";
         }
 
-        return "User account deleted, but agent profile deletion failed.";
+        // Update BST after successful deletion
+        rebuildAgentBST();
+
+        return "Agent profile and user account deleted successfully!";
     }
+
+
 }
