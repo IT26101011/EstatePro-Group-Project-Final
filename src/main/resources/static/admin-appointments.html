@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Appointments | EstatePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <div class="header-links">
+        <a href="/admin-dashboard.html">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Manage Appointments</h1>
+    <p class="subtitle">Monitor all appointments between clients and agents.</p>
+
+    <div id="message"></div>
+    <div class="table-box" id="tableBox">Loading...</div>
+</div>
+
+<script src="/admin.js"></script>
+<script>
+
+    const box = document.getElementById("tableBox");
+
+    async function loadAppointments() {
+
+        try {
+
+            const appointments = await getList("/admin/appointments");
+
+            if (appointments.length === 0) {
+                showEmpty(box, "No appointments found.");
+                return;
+            }
+
+            buildTable(box,
+                ["ID", "Property", "Client", "Agent", "Date", "Time", "Status", "Action"],
+                appointments,
+                function (row, appointment) {
+
+                    makeCell(row, appointment.appointmentId);
+                    makeCell(row, appointment.propertyId);
+                    makeCell(row, appointment.clientEmail);
+                    makeCell(row, appointment.agentEmail);
+                    makeCell(row, appointment.appointmentDate);
+                    makeCell(row, appointment.appointmentTime);
+                    makeBadgeCell(row, appointment.status);
+
+                    const actionCell = document.createElement("td");
+
+                    actionCell.appendChild(makeButton("Delete", "red-btn", function () {
+                        deleteAppointment(appointment.appointmentId);
+                    }));
+
+                    row.appendChild(actionCell);
+                });
+
+        } catch (error) {
+            showEmpty(box, error.message);
+        }
+    }
+
+    async function deleteAppointment(appointmentId) {
+
+        if (!confirm("Delete appointment " + appointmentId + "?")) {
+            return;
+        }
+
+        const result = await postForm("/admin/delete-appointment", { appointmentId: appointmentId });
+
+        showMessage(result, result.includes("successfully"));
+        loadAppointments();
+    }
+
+    loadAppointments();
+
+</script>
+</body>
+</html>

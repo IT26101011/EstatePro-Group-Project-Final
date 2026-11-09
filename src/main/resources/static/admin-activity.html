@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Activity Log | EstatePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <div class="header-links">
+        <a href="/admin-dashboard.html">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Admin Activity Log</h1>
+    <p class="subtitle">Actions done by admins (property and appointment deletions).</p>
+
+    <div id="message"></div>
+    <div class="table-box" id="tableBox">Loading...</div>
+</div>
+
+<script src="/admin.js"></script>
+<script>
+
+    const box = document.getElementById("tableBox");
+
+    async function loadActivities() {
+
+        try {
+
+            const activities = await getList("/admin/activity");
+
+            if (activities.length === 0) {
+                showEmpty(box, "No activity recorded yet.");
+                return;
+            }
+
+            buildTable(box,
+                ["Date & Time", "Admin", "Action", "Details"],
+                activities,
+                function (row, activity) {
+
+                    makeCell(row, activity.dateTime);
+                    makeCell(row, activity.adminEmail);
+                    makeCell(row, activity.action);
+                    makeCell(row, activity.details);
+                });
+
+        } catch (error) {
+            showEmpty(box, error.message);
+        }
+    }
+
+    loadActivities();
+
+</script>
+</body>
+</html>
