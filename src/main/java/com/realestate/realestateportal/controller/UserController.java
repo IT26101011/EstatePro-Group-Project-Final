@@ -83,6 +83,7 @@ public class UserController {
         profile.put("email", loggedInUser.getEmail());
         profile.put("phone", loggedInUser.getPhone());
         profile.put("role", loggedInUser.getRole());
+        profile.put("accountDescription", loggedInUser.getAccountDescription());
 
         return profile;
     }
