@@ -9,8 +9,6 @@ import com.realestate.realestateportal.service.PropertyService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/appointment")
 public class AppointmentController {
@@ -140,7 +138,7 @@ public class AppointmentController {
         );
     }
 
-    // Delete Appointment
+    // Cancel Appointment - Client Only
     @PostMapping("/delete")
     public String deleteAppointment(
             @RequestParam String appointmentId,
@@ -148,27 +146,18 @@ public class AppointmentController {
 
         User user = (User) session.getAttribute("loggedInUser");
 
-        if (user == null) {
-            return "Please login first.";
+        if (user == null || !"CLIENT".equals(user.getRole())) {
+            return "Please login as a Client.";
         }
 
         Appointment appointment =
                 appointmentService.getAppointmentById(appointmentId);
 
-        if (appointment == null) {
-            return "Appointment not found.";
+        if (appointment == null ||
+                !appointment.getClientEmail().equalsIgnoreCase(user.getEmail())) {
+            return "Appointment not found or access denied.";
         }
 
-        boolean isClient = "CLIENT".equals(user.getRole()) &&
-                appointment.getClientEmail().equalsIgnoreCase(user.getEmail());
-
-        boolean isAgent = "AGENT".equals(user.getRole()) &&
-                appointment.getAgentEmail().equalsIgnoreCase(user.getEmail());
-
-        if (!isClient && !isAgent) {
-            return "Access denied.";
-        }
-
-        return appointmentService.deleteAppointment(appointmentId);
+        return appointmentService.cancelAppointment(appointmentId);
     }
 }

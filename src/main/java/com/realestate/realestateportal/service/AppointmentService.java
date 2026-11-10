@@ -55,7 +55,6 @@ public class AppointmentService {
             return "Invalid appointment date or time.";
         }
 
-        // Conflict Checking
         if (hasConflict(
                 appointment.getAgentEmail(),
                 appointment.getAppointmentDate(),
@@ -117,6 +116,10 @@ public class AppointmentService {
             return "Appointment not found.";
         }
 
+        if (!"PENDING".equals(existing.getStatus())) {
+            return "Only pending appointments can be updated.";
+        }
+
         if (appointment.getAppointmentDate() == null ||
                 appointment.getAppointmentDate().isBlank() ||
                 appointment.getAppointmentTime() == null ||
@@ -146,7 +149,7 @@ public class AppointmentService {
             return "Invalid appointment date or time.";
         }
 
-        // Conflict Checking (Exclude Current Appointment)
+        // Conflict Checking
         if (hasConflict(
                 existing.getAgentEmail(),
                 appointment.getAppointmentDate(),
@@ -192,6 +195,10 @@ public class AppointmentService {
             return "Appointment not found.";
         }
 
+        if (!"PENDING".equals(appointment.getStatus())) {
+            return "This appointment has already been processed.";
+        }
+
         // Check Conflict Before Approval
         if ("APPROVED".equals(status) &&
                 hasConflict(
@@ -213,15 +220,28 @@ public class AppointmentService {
                 : "Unable to update appointment status.";
     }
 
-    // Delete Appointment
-    public String deleteAppointment(String appointmentId) {
+    // Cancel Appointment - Soft Delete
+    public synchronized String cancelAppointment(String appointmentId) {
 
-        boolean deleted =
-                appointmentRepository.deleteAppointment(appointmentId);
+        Appointment appointment =
+                appointmentRepository.findById(appointmentId);
 
-        return deleted
-                ? "Appointment deleted successfully!"
-                : "Appointment not found.";
+        if (appointment == null) {
+            return "Appointment not found.";
+        }
+
+        if (!"PENDING".equals(appointment.getStatus())) {
+            return "Only pending appointments can be cancelled.";
+        }
+
+        appointment.setStatus("CANCELLED");
+
+        boolean updated =
+                appointmentRepository.updateAppointment(appointment);
+
+        return updated
+                ? "Appointment cancelled successfully!"
+                : "Unable to cancel appointment.";
     }
 
     // Conflict Checking Method
@@ -236,7 +256,6 @@ public class AppointmentService {
 
         for (Appointment existing : appointments) {
 
-            // Ignore current appointment during update
             if (excludeAppointmentId != null &&
                     excludeAppointmentId.equals(
                             existing.getAppointmentId())) {

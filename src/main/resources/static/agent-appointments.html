@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Appointments | EstatePro</title>
-
 
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -58,7 +56,40 @@
 
     .subtitle {
       color: #778078;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .refresh-info {
+      color: #839087;
+      font-size: 13px;
+    }
+
+    .refresh-btn {
+      background: #123c2d;
+      color: white;
+      padding: 11px 20px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+    }
+
+    .refresh-btn:hover {
+      background: #1d704c;
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .card {
@@ -114,6 +145,11 @@
     .COMPLETED {
       background: #e5eee9;
       color: #315c48;
+    }
+
+    .CANCELLED {
+      background: #f1e5e5;
+      color: #a12b2b;
     }
 
     .details {
@@ -187,10 +223,13 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
     }
   </style>
-
-
 </head>
 
 <body>
@@ -202,63 +241,149 @@
 
 <div class="container">
 
-
   <h1>Manage Appointments</h1>
-  <p class="subtitle">View and manage appointment requests from clients.</p>
+
+  <p class="subtitle">
+    View and manage appointment requests from clients.
+  </p>
+
+  <div class="toolbar">
+
+    <div class="refresh-info" id="refreshInfo">
+      Loading appointments...
+    </div>
+
+    <button
+            type="button"
+            class="refresh-btn"
+            id="refreshBtn"
+            onclick="loadAppointments(true)">
+      ↻ Refresh
+    </button>
+
+  </div>
 
   <div id="message"></div>
-  <div id="appointments">Loading appointments...</div>
 
+  <div id="appointments">
+    Loading appointments...
+  </div>
 
 </div>
 
 <script>
-  const container = document.getElementById("appointments");
 
-  async function loadAppointments() {
-    container.textContent = "Loading appointments...";
+  const container = document.getElementById("appointments");
+  const messageElement = document.getElementById("message");
+  const refreshInfo = document.getElementById("refreshInfo");
+  const refreshBtn = document.getElementById("refreshBtn");
+
+  let isLoading = false;
+  let isFirstLoad = true;
+
+  // Load Agent Appointments
+  async function loadAppointments(manualRefresh = false) {
+
+    if (isLoading) {
+      return;
+    }
+
+    isLoading = true;
+    refreshBtn.disabled = true;
+
+    if (isFirstLoad) {
+      container.textContent = "Loading appointments...";
+    }
+
+    if (manualRefresh) {
+      refreshInfo.textContent = "Refreshing appointments...";
+    }
 
     try {
-      const response = await fetch("/appointment/agent-appointments");
+
+      const response = await fetch("/appointment/agent-appointments", {
+        cache: "no-store"
+      });
+
       const result = await response.json();
 
       if (!response.ok || !Array.isArray(result)) {
-        throw new Error("Unable to load appointments. Please login as Agent.");
+        throw new Error(
+                "Unable to load appointments. Please login as Agent."
+        );
       }
 
       container.innerHTML = "";
 
       if (result.length === 0) {
-        container.innerHTML =
-                '<div class="empty"><h3>No Appointments Found</h3><p>You have no appointment requests yet.</p></div>';
-        return;
+
+        container.innerHTML = `
+                    <div class="empty">
+                        <h3>No Appointments Found</h3>
+                        <p>You have no appointment requests yet.</p>
+                    </div>
+                `;
+
+      } else {
+
+        for (const appointment of result) {
+          await displayAppointment(appointment);
+        }
+
       }
 
-      for (const appointment of result) {
-        await displayAppointment(appointment);
-      }
+      refreshInfo.textContent =
+              "Last updated: " + new Date().toLocaleTimeString();
+
+      isFirstLoad = false;
 
     } catch (error) {
-      container.textContent = error.message;
+
+      console.error(error);
+
+      if (isFirstLoad || manualRefresh) {
+        container.textContent = error.message;
+      }
+
+      refreshInfo.textContent = "Unable to refresh appointments.";
+
+    } finally {
+
+      isLoading = false;
+      refreshBtn.disabled = false;
+
     }
   }
 
+
+  // Display Individual Appointment
   async function displayAppointment(appointment) {
+
     let title = appointment.propertyId;
     let location = "Not available";
 
     try {
+
       const response = await fetch(
-              "/property/" + encodeURIComponent(appointment.propertyId)
+              "/property/" + encodeURIComponent(appointment.propertyId),
+              {
+                cache: "no-store"
+              }
       );
 
       if (response.ok) {
+
         const property = await response.json();
+
         title = property.title || title;
         location = property.location || location;
+
       }
+
     } catch (error) {
+
       console.log("Property details unavailable.");
+
     }
 
     const card = document.createElement("div");
@@ -280,10 +405,18 @@
     heading.append(propertyTitle, id);
 
     const status = document.createElement("span");
-    const validStatuses = ["PENDING", "APPROVED", "REJECTED", "COMPLETED"];
+
+    const validStatuses = [
+      "PENDING",
+      "APPROVED",
+      "REJECTED",
+      "COMPLETED",
+      "CANCELLED"
+    ];
+
     const currentStatus = validStatuses.includes(appointment.status)
             ? appointment.status
-            : "PENDING";
+            : "UNKNOWN";
 
     status.className = "status " + currentStatus;
     status.textContent = currentStatus;
@@ -302,10 +435,13 @@
 
     card.appendChild(details);
 
+    // Agent Actions - Pending Appointments Only
     if (currentStatus === "PENDING") {
+
       const approve = document.createElement("button");
       approve.className = "approve-btn";
       approve.textContent = "Approve";
+
       approve.onclick = function () {
         updateStatus(appointment.appointmentId, "APPROVED");
       };
@@ -313,6 +449,7 @@
       const reject = document.createElement("button");
       reject.className = "reject-btn";
       reject.textContent = "Reject";
+
       reject.onclick = function () {
         updateStatus(appointment.appointmentId, "REJECTED");
       };
@@ -323,7 +460,10 @@
     container.appendChild(card);
   }
 
+
+  // Add Appointment Details
   function addDetail(parent, label, value) {
+
     const div = document.createElement("div");
     div.className = "detail";
 
@@ -334,46 +474,76 @@
     content.textContent = value || "Not available";
 
     div.append(name, content);
+
     parent.appendChild(div);
   }
 
+
+  // Update Appointment Status
   async function updateStatus(id, status) {
-    if (!confirm("Are you sure you want to " + status.toLowerCase() + " this appointment?")) {
+
+    if (!confirm(
+            "Are you sure you want to " +
+            status.toLowerCase() +
+            " this appointment?"
+    )) {
       return;
     }
 
     const data = new URLSearchParams();
+
     data.append("appointmentId", id);
     data.append("status", status);
 
     try {
+
       const response = await fetch("/appointment/update-status", {
+
         method: "POST",
+
         headers: {
           "Content-Type": "application/x-www-form-urlencoded"
         },
+
         body: data
+
       });
 
       const result = await response.text();
 
-      const message = document.getElementById("message");
-      message.textContent = result;
-      message.style.color = result.includes("successfully")
+      messageElement.textContent = result;
+
+      const success = result.includes("successfully");
+
+      messageElement.style.color = success
               ? "#087443"
               : "#b42318";
 
-      if (result.includes("successfully")) {
-        loadAppointments();
+      if (success) {
+        await loadAppointments(true);
       }
 
     } catch (error) {
-      document.getElementById("message").textContent =
+
+      messageElement.textContent =
               "Request failed. Please try again.";
+
+      messageElement.style.color = "#b42318";
+
     }
   }
 
+
+  // Initial Load
   loadAppointments();
+
+
+  // Automatically Refresh Every 10 Seconds
+  setInterval(function () {
+    loadAppointments();
+  }, 10000);
+
+
 </script>
 
 </body>
