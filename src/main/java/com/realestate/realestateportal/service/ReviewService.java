@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public class ReviewService {
 
-
     private final ReviewRepository reviewRepository;
 
     public ReviewService() {
@@ -28,12 +27,17 @@ public class ReviewService {
         }
 
         if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+            throw new IllegalArgumentException(
+                    "Rating must be between 1 and 5."
+            );
         }
 
         if (comment == null || comment.isBlank()) {
-            throw new IllegalArgumentException("Review comment cannot be empty.");
+            throw new IllegalArgumentException(
+                    "Review comment cannot be empty."
+            );
         }
+
         if (comment.contains("|")
                 || comment.contains("\n")
                 || comment.contains("\r")) {
@@ -54,7 +58,11 @@ public class ReviewService {
                 "PENDING"
         );
 
-        reviewRepository.saveReview(review);
+        boolean saved = reviewRepository.saveReview(review);
+
+        if (!saved) {
+            throw new IllegalStateException("Failed to save review.");
+        }
 
         return review;
     }
@@ -80,6 +88,10 @@ public class ReviewService {
                                 int rating,
                                 String comment) {
 
+        if (clientEmail == null || clientEmail.isBlank()) {
+            return false;
+        }
+
         Review review = reviewRepository.findById(reviewId);
 
         if (review == null) {
@@ -95,12 +107,17 @@ public class ReviewService {
         }
 
         if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5.");
+            throw new IllegalArgumentException(
+                    "Rating must be between 1 and 5."
+            );
         }
 
         if (comment == null || comment.isBlank()) {
-            throw new IllegalArgumentException("Review comment cannot be empty.");
+            throw new IllegalArgumentException(
+                    "Review comment cannot be empty."
+            );
         }
+
         if (comment.contains("|")
                 || comment.contains("\n")
                 || comment.contains("\r")) {
@@ -108,7 +125,6 @@ public class ReviewService {
                     "Review comment cannot contain | or line breaks."
             );
         }
-
 
         review.setRating(rating);
         review.setComment(comment.trim());
@@ -118,6 +134,10 @@ public class ReviewService {
 
     // Delete Review
     public boolean deleteReview(String reviewId, String clientEmail) {
+
+        if (clientEmail == null || clientEmail.isBlank()) {
+            return false;
+        }
 
         Review review = reviewRepository.findById(reviewId);
 
@@ -135,9 +155,13 @@ public class ReviewService {
     // Update Review Status
     public boolean updateReviewStatus(String reviewId, String status) {
 
-        if (!status.equals("APPROVED") && !status.equals("REJECTED")) {
+        if (status == null ||
+                (!status.equalsIgnoreCase("APPROVED")
+                        && !status.equalsIgnoreCase("REJECTED"))) {
             return false;
         }
+
+        status = status.toUpperCase();
 
         Review review = reviewRepository.findById(reviewId);
 
