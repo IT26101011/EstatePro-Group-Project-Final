@@ -50,8 +50,9 @@ public class ReviewController {
                     && appointment.getAgentEmail()
                     .equalsIgnoreCase(agentEmail);
 
-            boolean validStatus = "APPROVED".equals(appointment.getStatus())
-                    || "COMPLETED".equals(appointment.getStatus());
+            // Only completed appointments are eligible
+            boolean validStatus =
+                    "COMPLETED".equalsIgnoreCase(appointment.getStatus());
 
             if (correctAgent && validStatus) {
                 validAppointment = true;
@@ -60,7 +61,7 @@ public class ReviewController {
         }
 
         if (!validAppointment) {
-            return "You must have an approved appointment with this Agent to submit a review.";
+            return "You must have a completed appointment with this Agent to submit a review.";
         }
 
         try {
@@ -201,6 +202,7 @@ public class ReviewController {
         if (status == null ||
                 (!"APPROVED".equalsIgnoreCase(status)
                         && !"REJECTED".equalsIgnoreCase(status))) {
+
             return "Invalid review status.";
         }
 

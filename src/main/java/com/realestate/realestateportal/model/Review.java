@@ -1,5 +1,7 @@
 package com.realestate.realestateportal.model;
 
+import java.util.Locale;
+
 public class Review {
 
     private String reviewId;
@@ -69,7 +71,9 @@ public class Review {
 
     public void setRating(int rating) {
         if (rating < 1 || rating > 5) {
-            throw new IllegalArgumentException("Rating must be between 1 and 5");
+            throw new IllegalArgumentException(
+                    "Rating must be between 1 and 5"
+            );
         }
         this.rating = rating;
     }
@@ -80,7 +84,9 @@ public class Review {
 
     public void setComment(String comment) {
         if (comment == null || comment.trim().isEmpty()) {
-            throw new IllegalArgumentException("Review comment cannot be empty");
+            throw new IllegalArgumentException(
+                    "Review comment cannot be empty"
+            );
         }
         this.comment = comment.trim();
     }
@@ -91,7 +97,9 @@ public class Review {
 
     public void setDate(String date) {
         if (date == null || date.trim().isEmpty()) {
-            throw new IllegalArgumentException("Review date cannot be empty");
+            throw new IllegalArgumentException(
+                    "Review date cannot be empty"
+            );
         }
         this.date = date.trim();
     }
@@ -101,9 +109,24 @@ public class Review {
     }
 
     public void setStatus(String status) {
+
         if (status == null || status.trim().isEmpty()) {
-            throw new IllegalArgumentException("Review status cannot be empty");
+            throw new IllegalArgumentException(
+                    "Review status cannot be empty"
+            );
         }
-        this.status = status.trim();
+
+        String normalizedStatus = status.trim().toUpperCase(Locale.ROOT);
+
+        if (!normalizedStatus.equals("PENDING")
+                && !normalizedStatus.equals("APPROVED")
+                && !normalizedStatus.equals("REJECTED")) {
+
+            throw new IllegalArgumentException(
+                    "Status must be PENDING, APPROVED or REJECTED"
+            );
+        }
+
+        this.status = normalizedStatus;
     }
 }
