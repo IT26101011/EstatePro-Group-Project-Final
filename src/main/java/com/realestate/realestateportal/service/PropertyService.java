@@ -1,5 +1,5 @@
 
-package com.realestate.realestateportal.service;
+        package com.realestate.realestateportal.service;
 
 import com.realestate.realestateportal.model.Property;
 import com.realestate.realestateportal.repository.PropertyRepository;
