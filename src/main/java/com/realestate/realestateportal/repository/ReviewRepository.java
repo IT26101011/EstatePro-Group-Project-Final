@@ -2,34 +2,51 @@ package com.realestate.realestateportal.repository;
 
 import com.realestate.realestateportal.model.Review;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewRepository {
 
+    private static final String FILE_PATH = "data/reviews.txt";
+    private static final String SEPARATOR = "|";
 
-    private final String FILE_PATH = "data/reviews.txt";
-
+    // Constructor
     public ReviewRepository() {
         try {
-            Files.createDirectories(Paths.get("data"));
+            Path directory = Paths.get("data");
+            Files.createDirectories(directory);
 
-            File file = new File(FILE_PATH);
+            Path file = Paths.get(FILE_PATH);
 
-            if (!file.exists()) {
-                file.createNewFile();
+            if (Files.notExists(file)) {
+                Files.createFile(file);
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Unable to initialize reviews file.", e);
+            throw new RuntimeException(
+                    "Unable to initialize reviews file.", e);
         }
     }
 
-    // Save Review
-    public void saveReview(Review review) {
+    // Create - Save Review
+    public boolean saveReview(Review review) {
+
+        if (review == null) {
+            throw new IllegalArgumentException(
+                    "Review cannot be null.");
+        }
+
+        if (findById(review.getReviewId()) != null) {
+            return false;
+        }
 
         try (BufferedWriter writer = Files.newBufferedWriter(
                 Paths.get(FILE_PATH),
@@ -40,22 +57,30 @@ public class ReviewRepository {
             writer.write(convertToLine(review));
             writer.newLine();
 
+            return true;
+
         } catch (IOException e) {
-            throw new RuntimeException("Unable to save review.", e);
+            throw new RuntimeException(
+                    "Unable to save review.", e);
         }
     }
 
-    // Get All Reviews
+    // Read - Get All Reviews
     public List<Review> getAllReviews() {
 
         List<Review> reviews = new ArrayList<>();
 
         try (BufferedReader reader = Files.newBufferedReader(
-                Paths.get(FILE_PATH), StandardCharsets.UTF_8)) {
+                Paths.get(FILE_PATH),
+                StandardCharsets.UTF_8)) {
 
             String line;
 
             while ((line = reader.readLine()) != null) {
+
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
 
                 Review review = convertToReview(line);
 
@@ -65,7 +90,8 @@ public class ReviewRepository {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Unable to read reviews.", e);
+            throw new RuntimeException(
+                    "Unable to read reviews.", e);
         }
 
         return reviews;
@@ -73,6 +99,10 @@ public class ReviewRepository {
 
     // Find Review By ID
     public Review findById(String reviewId) {
+
+        if (reviewId == null) {
+            return null;
+        }
 
         for (Review review : getAllReviews()) {
 
@@ -89,6 +119,10 @@ public class ReviewRepository {
 
         List<Review> result = new ArrayList<>();
 
+        if (email == null) {
+            return result;
+        }
+
         for (Review review : getAllReviews()) {
 
             if (review.getAgentEmail().equalsIgnoreCase(email)) {
@@ -104,6 +138,10 @@ public class ReviewRepository {
 
         List<Review> result = new ArrayList<>();
 
+        if (email == null) {
+            return result;
+        }
+
         for (Review review : getAllReviews()) {
 
             if (review.getClientEmail().equalsIgnoreCase(email)) {
@@ -116,6 +154,11 @@ public class ReviewRepository {
 
     // Update Review
     public boolean updateReview(Review updatedReview) {
+
+        if (updatedReview == null) {
+            throw new IllegalArgumentException(
+                    "Updated review cannot be null.");
+        }
 
         List<Review> reviews = getAllReviews();
 
@@ -142,6 +185,10 @@ public class ReviewRepository {
     // Delete Review
     public boolean deleteReview(String reviewId) {
 
+        if (reviewId == null) {
+            return false;
+        }
+
         List<Review> reviews = getAllReviews();
 
         boolean removed = reviews.removeIf(
@@ -160,7 +207,9 @@ public class ReviewRepository {
 
         try (BufferedWriter writer = Files.newBufferedWriter(
                 Paths.get(FILE_PATH),
-                StandardCharsets.UTF_8)) {
+                StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING)) {
 
             for (Review review : reviews) {
                 writer.write(convertToLine(review));
@@ -168,14 +217,15 @@ public class ReviewRepository {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Unable to update reviews file.", e);
+            throw new RuntimeException(
+                    "Unable to update reviews file.", e);
         }
     }
 
-    // Convert Review To Text Line
+    // Convert Review Object To Text Line
     private String convertToLine(Review review) {
 
-        return String.join("|",
+        String[] values = {
                 review.getReviewId(),
                 review.getAgentEmail(),
                 review.getClientEmail(),
@@ -183,10 +233,24 @@ public class ReviewRepository {
                 review.getComment(),
                 review.getDate(),
                 review.getStatus()
-        );
+        };
+
+        for (String value : values) {
+
+            if (value == null ||
+                    value.contains(SEPARATOR) ||
+                    value.contains("\n") ||
+                    value.contains("\r")) {
+
+                throw new IllegalArgumentException(
+                        "Review data contains invalid characters.");
+            }
+        }
+
+        return String.join(SEPARATOR, values);
     }
 
-    // Convert Text Line To Review
+    // Convert Text Line To Review Object
     private Review convertToReview(String line) {
 
         String[] data = line.split("\\|", -1);
@@ -205,10 +269,9 @@ public class ReviewRepository {
                     data[5],
                     data[6]
             );
-        } catch (NumberFormatException e) {
+
+        } catch (IllegalArgumentException e) {
             return null;
         }
     }
-
-
 }

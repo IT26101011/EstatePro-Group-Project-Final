@@ -46,7 +46,8 @@ public class ReviewController {
 
         for (Appointment appointment : appointments) {
 
-            boolean correctAgent = appointment.getAgentEmail()
+            boolean correctAgent = appointment.getAgentEmail() != null
+                    && appointment.getAgentEmail()
                     .equalsIgnoreCase(agentEmail);
 
             boolean validStatus = "APPROVED".equals(appointment.getStatus())
@@ -74,6 +75,9 @@ public class ReviewController {
 
         } catch (IllegalArgumentException e) {
             return e.getMessage();
+
+        } catch (IllegalStateException e) {
+            return "Unable to save review. Please try again.";
         }
     }
 
@@ -194,7 +198,9 @@ public class ReviewController {
             return "Access denied. Admin access required.";
         }
 
-        if (!"APPROVED".equals(status) && !"REJECTED".equals(status)) {
+        if (status == null ||
+                (!"APPROVED".equalsIgnoreCase(status)
+                        && !"REJECTED".equalsIgnoreCase(status))) {
             return "Invalid review status.";
         }
 

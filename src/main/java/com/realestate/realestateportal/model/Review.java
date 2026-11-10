@@ -10,28 +10,35 @@ public class Review {
     private String date;
     private String status;
 
+    // Default Constructor
     public Review() {
     }
 
+    // Parameterized Constructor
     public Review(String reviewId, String agentEmail,
                   String clientEmail, int rating,
                   String comment, String date, String status) {
 
-        this.reviewId = reviewId;
-        this.agentEmail = agentEmail;
-        this.clientEmail = clientEmail;
-        this.rating = rating;
-        this.comment = comment;
-        this.date = date;
-        this.status = status;
+        setReviewId(reviewId);
+        setAgentEmail(agentEmail);
+        setClientEmail(clientEmail);
+        setRating(rating);
+        setComment(comment);
+        setDate(date);
+        setStatus(status);
     }
+
+    // Getters and Setters
 
     public String getReviewId() {
         return reviewId;
     }
 
     public void setReviewId(String reviewId) {
-        this.reviewId = reviewId;
+        if (reviewId == null || reviewId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Review ID cannot be empty");
+        }
+        this.reviewId = reviewId.trim();
     }
 
     public String getAgentEmail() {
@@ -39,7 +46,10 @@ public class Review {
     }
 
     public void setAgentEmail(String agentEmail) {
-        this.agentEmail = agentEmail;
+        if (agentEmail == null || agentEmail.trim().isEmpty()) {
+            throw new IllegalArgumentException("Agent email cannot be empty");
+        }
+        this.agentEmail = agentEmail.trim();
     }
 
     public String getClientEmail() {
@@ -47,7 +57,10 @@ public class Review {
     }
 
     public void setClientEmail(String clientEmail) {
-        this.clientEmail = clientEmail;
+        if (clientEmail == null || clientEmail.trim().isEmpty()) {
+            throw new IllegalArgumentException("Client email cannot be empty");
+        }
+        this.clientEmail = clientEmail.trim();
     }
 
     public int getRating() {
@@ -55,6 +68,9 @@ public class Review {
     }
 
     public void setRating(int rating) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
         this.rating = rating;
     }
 
@@ -63,7 +79,10 @@ public class Review {
     }
 
     public void setComment(String comment) {
-        this.comment = comment;
+        if (comment == null || comment.trim().isEmpty()) {
+            throw new IllegalArgumentException("Review comment cannot be empty");
+        }
+        this.comment = comment.trim();
     }
 
     public String getDate() {
@@ -71,7 +90,10 @@ public class Review {
     }
 
     public void setDate(String date) {
-        this.date = date;
+        if (date == null || date.trim().isEmpty()) {
+            throw new IllegalArgumentException("Review date cannot be empty");
+        }
+        this.date = date.trim();
     }
 
     public String getStatus() {
@@ -79,7 +101,9 @@ public class Review {
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        if (status == null || status.trim().isEmpty()) {
+            throw new IllegalArgumentException("Review status cannot be empty");
+        }
+        this.status = status.trim();
     }
-
 }
