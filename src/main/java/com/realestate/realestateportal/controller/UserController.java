@@ -9,25 +9,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import com.realestate.realestateportal.model.Client;
 
 @RestController
 public class UserController {
 
-
     private final UserService userService = new UserService();
 
     // User Registration
-    @PostMapping("/register")
+    @PostMapping("/register") // "C" of CRUD
     public String registerUser(
-            @ModelAttribute User user,
+            @ModelAttribute Client client,
             @RequestParam("confirmPassword") String confirmPassword) {
 
-        if (!user.getPassword().equals(confirmPassword)) {
+        if (client.getPassword() == null ||
+                !client.getPassword().equals(confirmPassword)) {
             return "Passwords do not match!";
         }
 
-        return userService.registerUser(user);
+        return userService.registerUser(client);
     }
+
 
     // User Login
     @PostMapping("/login")
@@ -64,7 +66,7 @@ public class UserController {
 
     // View Own Profile
     @GetMapping("/profile")
-    public Object getMyProfile(HttpSession session) {
+    public Object getMyProfile(HttpSession session) {//Responsible for read an existing user."R"of CRUD
 
         User loggedInUser = (User) session.getAttribute("loggedInUser");
 
@@ -81,13 +83,14 @@ public class UserController {
         profile.put("email", loggedInUser.getEmail());
         profile.put("phone", loggedInUser.getPhone());
         profile.put("role", loggedInUser.getRole());
+        profile.put("accountDescription", loggedInUser.getAccountDescription());
 
         return profile;
     }
 
     // Update Own Profile
     @PostMapping("/profile/update")
-    public String updateMyProfile(
+    public String updateMyProfile(//Responsible for updating an existing profile."U"of CRUD
             @RequestParam("fullName") String fullName,
             @RequestParam("phone") String phone,
             @RequestParam(value = "currentPassword", required = false) String currentPassword,
@@ -117,9 +120,32 @@ public class UserController {
         return result;
     }
 
-// =====================================
+    // Delete Own Account
+    @PostMapping("/profile/delete")
+    public String deleteOwnAccount(
+            @RequestParam("currentPassword") String currentPassword,
+            HttpSession session) {
+
+        User loggedInUser =
+                (User) session.getAttribute("loggedInUser");
+
+        if (loggedInUser == null) {
+            return "Please login to delete your account.";
+        }
+
+        String result = userService.deleteOwnAccount(
+                loggedInUser.getEmail(),
+                currentPassword
+        );
+
+        if (result.equals("Account deleted successfully!")) {
+            session.invalidate();
+        }
+
+        return result;
+    }
+
 // ADMIN MANAGEMENT
-// =====================================
 
     // View All Users
     @GetMapping("/admin/users")

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,6 +29,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo {
@@ -39,6 +40,12 @@
 
         .logo span {
             color: #d5b56b;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .back {
@@ -134,6 +141,124 @@
             transform: translateY(-2px);
         }
 
+        .delete-section {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .delete-section h3 {
+            color: #c0392b;
+            margin-bottom: 10px;
+        }
+
+        .delete-section p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .delete-btn {
+            padding: 11px 22px;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #922b21;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 430px;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .modal-content h2 {
+            color: #c0392b;
+            margin-bottom: 12px;
+        }
+
+        .modal-content p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-content label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .modal-content input:focus {
+            border-color: #123c2d;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .cancel-btn {
+            padding: 10px 18px;
+            background: #eee;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .confirm-delete-btn {
+            padding: 10px 18px;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .confirm-delete-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #deleteMessage {
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
         @media (max-width: 600px) {
             .profile-card {
                 padding: 25px;
@@ -151,13 +276,15 @@
 <header>
     <div class="logo">Estate<span>Pro.</span></div>
 
-    <a href="/client-dashboard.html" class="back">
-        Back to Dashboard
-    </a>
+    <div class="header-actions">
+        <a href="/client-dashboard.html" class="back">
+            Back to Dashboard
+        </a>
 
-    <a href="/edit-profile.html" class="edit-profile-btn">
-        ✎ Edit Profile
-    </a>
+        <a href="/edit-profile.html" class="edit-profile-btn">
+            ✎ Edit Profile
+        </a>
+    </div>
 </header>
 
 <div class="container">
@@ -196,11 +323,84 @@
                 <p><span class="role" id="role"></span></p>
             </div>
 
+            <div class="profile-item">
+                <label>Account Type</label>
+                <p id="accountDescription"></p>
+            </div>
+
+            <div class="delete-section" id="deleteSection"
+                 style="display:none;">
+
+                <h3>Delete Account</h3>
+
+                <p>
+                    Deleting your account is permanent.
+                    All your account information will be removed
+                    and you will be logged out.
+                </p>
+
+                <button class="delete-btn"
+                        onclick="openDeleteModal()">
+                    Delete My Account
+                </button>
+
+            </div>
+
         </div>
 
         <div id="errorMessage" class="message error"
              style="display:none;">
         </div>
+
+    </div>
+
+</div>
+
+<!-- Delete Account Confirmation Modal -->
+
+<div class="modal" id="deleteModal">
+
+    <div class="modal-content">
+
+        <h2>Delete Account?</h2>
+
+        <p>
+            Are you sure you want to permanently delete your account?
+            This action cannot be undone.
+            Please enter your current password to confirm.
+        </p>
+
+        <form id="deleteForm">
+
+            <label for="currentPassword">
+                Current Password
+            </label>
+
+            <input type="password"
+                   id="currentPassword"
+                   name="currentPassword"
+                   placeholder="Enter your current password"
+                   required>
+
+            <div id="deleteMessage"></div>
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="cancel-btn"
+                        onclick="closeDeleteModal()">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="confirm-delete-btn"
+                        id="confirmDeleteBtn">
+                    Confirm Delete
+                </button>
+
+            </div>
+
+        </form>
 
     </div>
 
@@ -223,10 +423,12 @@
             document.getElementById("loading").style.display = "none";
 
             if (!response.ok || data.error) {
+
                 document.getElementById("errorMessage").textContent =
                     data.error || "Unable to load profile.";
 
                 document.getElementById("errorMessage").style.display = "block";
+
                 return;
             }
 
@@ -234,8 +436,14 @@
             document.getElementById("email").textContent = data.email;
             document.getElementById("phone").textContent = data.phone;
             document.getElementById("role").textContent = data.role;
+            document.getElementById("accountDescription").textContent = data.accountDescription;
 
             document.getElementById("profileDetails").style.display = "block";
+
+            // Only CLIENT users can delete their own accounts
+            if (data.role === "CLIENT") {
+                document.getElementById("deleteSection").style.display = "block";
+            }
 
         } catch (error) {
 
@@ -247,6 +455,96 @@
             document.getElementById("errorMessage").style.display = "block";
         }
     }
+
+    function openDeleteModal() {
+
+        document.getElementById("deleteModal").style.display = "flex";
+
+        document.getElementById("currentPassword").value = "";
+
+        document.getElementById("deleteMessage").textContent = "";
+
+        document.getElementById("currentPassword").focus();
+    }
+
+    function closeDeleteModal() {
+
+        document.getElementById("deleteModal").style.display = "none";
+    }
+
+    document.getElementById("deleteForm").addEventListener("submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const password =
+                document.getElementById("currentPassword").value;
+
+            const message =
+                document.getElementById("deleteMessage");
+
+            const button =
+                document.getElementById("confirmDeleteBtn");
+
+            const formData = new URLSearchParams();
+
+            formData.append("currentPassword", password);
+
+            button.disabled = true;
+            button.textContent = "Deleting...";
+
+            message.style.color = "#777";
+            message.textContent = "Please wait...";
+
+            try {
+
+                const response = await fetch("/profile/delete", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+
+                    body: formData
+
+                });
+
+                const result = await response.text();
+
+                if (result === "Account deleted successfully!") {
+
+                    message.style.color = "green";
+                    message.textContent = result;
+
+                    setTimeout(function() {
+
+                        window.location.href =
+                            "/login.html?deleted=success";
+
+                    }, 1200);
+
+                } else {
+
+                    message.style.color = "#c0392b";
+                    message.textContent = result;
+
+                    button.disabled = false;
+                    button.textContent = "Confirm Delete";
+                }
+
+            } catch (error) {
+
+                message.style.color = "#c0392b";
+                message.textContent =
+                    "Something went wrong. Please try again.";
+
+                button.disabled = false;
+                button.textContent = "Confirm Delete";
+            }
+
+        }
+    );
 
     loadProfile();
 

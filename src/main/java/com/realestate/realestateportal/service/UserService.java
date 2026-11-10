@@ -215,9 +215,39 @@ public class UserService {
         return "Profile updated successfully!";
     }
 
-    // =====================================
+    // Delete Own Account
+    public String deleteOwnAccount(String email, String currentPassword) {
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            return "Please enter your current password.";
+        }
+
+        User user = userRepository.findByEmail(email);
+
+        if (user == null) {
+            return "User not found.";
+        }
+
+        // Only CLIENT users can delete their own account
+        if (!"CLIENT".equals(user.getRole())) {
+            return "Only Clients can delete their own accounts.";
+        }
+
+        // Verify current password
+        if (!verifyPassword(currentPassword, user.getPassword())) {
+            return "Incorrect password.";
+        }
+
+        boolean deleted = userRepository.deleteUser(email);
+
+        if (deleted) {
+            return "Account deleted successfully!";
+        }
+
+        return "Account deletion failed.";
+    }
+
     // ADMIN MANAGEMENT
-    // =====================================
 
     // Get all users
     public List<User> getAllUsers() {

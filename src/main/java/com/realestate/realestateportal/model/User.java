@@ -1,6 +1,6 @@
 package com.realestate.realestateportal.model;
 
-public class User {
+public class User implements Account {
 
     private String fullName;
     private String email;
@@ -60,4 +60,19 @@ public class User {
     public void setRole(String role) {
         this.role = role;
     }
+
+    @Override
+    public String getAccountDescription() {
+
+        if ("AGENT".equalsIgnoreCase(role)) {
+            return "Agent Account";
+        }
+
+        if ("ADMIN".equalsIgnoreCase(role)) {
+            return "Admin Account";
+        }
+
+        return "General User Account";
+    }
+
 }
