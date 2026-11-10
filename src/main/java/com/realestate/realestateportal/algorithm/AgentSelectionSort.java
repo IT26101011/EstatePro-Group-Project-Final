@@ -6,8 +6,11 @@ import com.realestate.realestateportal.model.Agent;
 import java.util.List;
 
 public class AgentSelectionSort {
-
     public void sortByRating(List<Agent> agents) {
+
+        if (agents == null) {
+            throw new IllegalArgumentException("Agent list cannot be null");
+        }
 
         int n = agents.size();
 
@@ -29,4 +32,5 @@ public class AgentSelectionSort {
             agents.set(maxIndex, temp);
         }
     }
+
 }
