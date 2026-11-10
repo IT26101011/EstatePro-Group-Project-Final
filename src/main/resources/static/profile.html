@@ -323,6 +323,11 @@
                 <p><span class="role" id="role"></span></p>
             </div>
 
+            <div class="profile-item">
+                <label>Account Type</label>
+                <p id="accountDescription"></p>
+            </div>
+
             <div class="delete-section" id="deleteSection"
                  style="display:none;">
 
@@ -431,6 +436,7 @@
             document.getElementById("email").textContent = data.email;
             document.getElementById("phone").textContent = data.phone;
             document.getElementById("role").textContent = data.role;
+            document.getElementById("accountDescription").textContent = data.accountDescription;
 
             document.getElementById("profileDetails").style.display = "block";
 
