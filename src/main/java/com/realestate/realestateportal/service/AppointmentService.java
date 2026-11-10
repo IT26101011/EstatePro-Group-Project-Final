@@ -14,7 +14,7 @@ public class AppointmentService {
             new AppointmentRepository();
 
     // Book Appointment
-    public String bookAppointment(Appointment appointment) {
+    public synchronized String bookAppointment(Appointment appointment) {
 
         if (appointment.getClientEmail() == null ||
                 appointment.getAgentEmail() == null ||
@@ -35,9 +35,11 @@ public class AppointmentService {
         }
 
         try {
+            LocalDate date = LocalDate.parse(
+                    appointment.getAppointmentDate());
 
-            LocalDate date = LocalDate.parse(appointment.getAppointmentDate());
-            LocalTime time = LocalTime.parse(appointment.getAppointmentTime());
+            LocalTime time = LocalTime.parse(
+                    appointment.getAppointmentTime());
 
             if (date.isBefore(LocalDate.now())) {
                 return "Please select a future date.";
@@ -50,9 +52,17 @@ public class AppointmentService {
             }
 
         } catch (Exception e) {
-
             return "Invalid appointment date or time.";
+        }
 
+        // Conflict Checking
+        if (hasConflict(
+                appointment.getAgentEmail(),
+                appointment.getAppointmentDate(),
+                appointment.getAppointmentTime(),
+                null)) {
+
+            return "Appointment conflict! This Agent already has an appointment at this time.";
         }
 
         if (appointment.getMessage() == null) {
@@ -72,30 +82,26 @@ public class AppointmentService {
 
     // Get All Appointments
     public List<Appointment> getAllAppointments() {
-
         return appointmentRepository.getAllAppointments();
     }
 
     // Get Client Appointments
     public List<Appointment> getClientAppointments(String email) {
-
         return appointmentRepository.findByClientEmail(email);
     }
 
     // Get Agent Appointments
     public List<Appointment> getAgentAppointments(String email) {
-
         return appointmentRepository.findByAgentEmail(email);
     }
 
     // Get Appointment By ID
     public Appointment getAppointmentById(String appointmentId) {
-
         return appointmentRepository.findById(appointmentId);
     }
 
     // Update Appointment
-    public String updateAppointment(Appointment appointment) {
+    public synchronized String updateAppointment(Appointment appointment) {
 
         if (appointment.getAppointmentId() == null ||
                 appointment.getAppointmentId().isBlank()) {
@@ -120,9 +126,11 @@ public class AppointmentService {
         }
 
         try {
+            LocalDate date = LocalDate.parse(
+                    appointment.getAppointmentDate());
 
-            LocalDate date = LocalDate.parse(appointment.getAppointmentDate());
-            LocalTime time = LocalTime.parse(appointment.getAppointmentTime());
+            LocalTime time = LocalTime.parse(
+                    appointment.getAppointmentTime());
 
             if (date.isBefore(LocalDate.now())) {
                 return "Please select a future date.";
@@ -135,9 +143,17 @@ public class AppointmentService {
             }
 
         } catch (Exception e) {
-
             return "Invalid appointment date or time.";
+        }
 
+        // Conflict Checking (Exclude Current Appointment)
+        if (hasConflict(
+                existing.getAgentEmail(),
+                appointment.getAppointmentDate(),
+                appointment.getAppointmentTime(),
+                existing.getAppointmentId())) {
+
+            return "Appointment conflict! This Agent already has an appointment at this time.";
         }
 
         existing.setAppointmentDate(appointment.getAppointmentDate());
@@ -155,7 +171,12 @@ public class AppointmentService {
     }
 
     // Update Appointment Status
-    public String updateAppointmentStatus(String appointmentId, String status) {
+    public synchronized String updateAppointmentStatus(
+            String appointmentId, String status) {
+
+        if (appointmentId == null || status == null) {
+            return "Invalid appointment details.";
+        }
 
         if (!status.equals("APPROVED") &&
                 !status.equals("REJECTED") &&
@@ -169,6 +190,17 @@ public class AppointmentService {
 
         if (appointment == null) {
             return "Appointment not found.";
+        }
+
+        // Check Conflict Before Approval
+        if ("APPROVED".equals(status) &&
+                hasConflict(
+                        appointment.getAgentEmail(),
+                        appointment.getAppointmentDate(),
+                        appointment.getAppointmentTime(),
+                        appointment.getAppointmentId())) {
+
+            return "Cannot approve! Another appointment already exists at this time.";
         }
 
         appointment.setStatus(status);
@@ -190,5 +222,57 @@ public class AppointmentService {
         return deleted
                 ? "Appointment deleted successfully!"
                 : "Appointment not found.";
+    }
+
+    // Conflict Checking Method
+    private boolean hasConflict(
+            String agentEmail,
+            String date,
+            String time,
+            String excludeAppointmentId) {
+
+        List<Appointment> appointments =
+                appointmentRepository.getAllAppointments();
+
+        for (Appointment existing : appointments) {
+
+            // Ignore current appointment during update
+            if (excludeAppointmentId != null &&
+                    excludeAppointmentId.equals(
+                            existing.getAppointmentId())) {
+
+                continue;
+            }
+
+            boolean sameAgent =
+                    existing.getAgentEmail() != null &&
+                            existing.getAgentEmail().equalsIgnoreCase(agentEmail);
+
+            boolean sameDate =
+                    existing.getAppointmentDate() != null &&
+                            existing.getAppointmentDate().equals(date);
+
+            boolean sameTime = false;
+
+            try {
+                if (existing.getAppointmentTime() != null) {
+                    sameTime = LocalTime.parse(
+                            existing.getAppointmentTime()
+                    ).equals(LocalTime.parse(time));
+                }
+            } catch (Exception e) {
+                sameTime = false;
+            }
+
+            boolean activeStatus =
+                    "PENDING".equalsIgnoreCase(existing.getStatus()) ||
+                            "APPROVED".equalsIgnoreCase(existing.getStatus());
+
+            if (sameAgent && sameDate && sameTime && activeStatus) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
