@@ -244,6 +244,21 @@ public class AppointmentService {
                 : "Unable to cancel appointment.";
     }
 
+    // Delete Appointment - Permanent Delete
+    public synchronized String deleteAppointment(String appointmentId) {
+
+        if (appointmentId == null || appointmentId.isBlank()) {
+            return "Invalid appointment ID.";
+        }
+
+        boolean deleted =
+                appointmentRepository.deleteAppointment(appointmentId);
+
+        return deleted
+                ? "Appointment deleted successfully!"
+                : "Appointment not found.";
+    }
+
     // Conflict Checking Method
     private boolean hasConflict(
             String agentEmail,
