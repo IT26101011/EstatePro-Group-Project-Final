@@ -56,6 +56,10 @@ public class AgentBST {
     // Search an agent by ID
     public Agent search(String agentId) {
 
+        if (agentId == null || agentId.trim().isEmpty()) {
+            throw new IllegalArgumentException("Agent ID cannot be empty");
+        }
+
         Node current = root;
 
         while (current != null) {
