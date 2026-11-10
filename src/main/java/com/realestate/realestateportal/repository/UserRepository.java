@@ -1,6 +1,8 @@
+
 package com.realestate.realestateportal.repository;
 
 import com.realestate.realestateportal.model.User;
+import com.realestate.realestateportal.model.Client;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -8,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserRepository {
-
 
     private static final String FILE_PATH = "data/users.txt";
 
@@ -50,7 +51,6 @@ public class UserRepository {
 
     // Check whether email already exists
     public boolean emailExists(String email) {
-
         return findByEmail(email) != null;
     }
 
@@ -91,13 +91,28 @@ public class UserRepository {
 
                 if (parts.length == 5) {
 
-                    User user = new User(
-                            parts[0],
-                            parts[1],
-                            parts[2],
-                            parts[3],
-                            parts[4]
-                    );
+                    User user;
+
+                    // Create Client objects for CLIENT accounts
+                    if ("CLIENT".equalsIgnoreCase(parts[4])) {
+
+                        user = new Client(
+                                parts[0],
+                                parts[1],
+                                parts[2],
+                                parts[3]
+                        );
+
+                    } else {
+
+                        user = new User(
+                                parts[0],
+                                parts[1],
+                                parts[2],
+                                parts[3],
+                                parts[4]
+                        );
+                    }
 
                     users.add(user);
                 }
@@ -109,7 +124,6 @@ public class UserRepository {
 
         return users;
     }
-
 
     // Update User Profile
     public boolean updateUserProfile(
@@ -126,11 +140,9 @@ public class UserRepository {
 
             if (user.getEmail().equalsIgnoreCase(email)) {
 
-                // Update only permitted fields
                 user.setFullName(fullName);
                 user.setPhone(phone);
 
-                // Update password only when a new password is provided
                 if (newPasswordHash != null && !newPasswordHash.isBlank()) {
                     user.setPassword(newPasswordHash);
                 }
@@ -146,7 +158,6 @@ public class UserRepository {
 
         return rewriteFile(users);
     }
-
 
     // Delete User
     public boolean deleteUser(String email) {
@@ -228,6 +239,4 @@ public class UserRepository {
             return false;
         }
     }
-
-
 }

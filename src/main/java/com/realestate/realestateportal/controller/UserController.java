@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import com.realestate.realestateportal.model.Client;
 
 @RestController
 public class UserController {
@@ -16,17 +17,19 @@ public class UserController {
     private final UserService userService = new UserService();
 
     // User Registration
-    @PostMapping("/register")//responsible for creating a new user."C" of CRUD
+    @PostMapping("/register") // "C" of CRUD
     public String registerUser(
-            @ModelAttribute User user,
+            @ModelAttribute Client client,
             @RequestParam("confirmPassword") String confirmPassword) {
 
-        if (!user.getPassword().equals(confirmPassword)) {
+        if (client.getPassword() == null ||
+                !client.getPassword().equals(confirmPassword)) {
             return "Passwords do not match!";
         }
 
-        return userService.registerUser(user);
+        return userService.registerUser(client);
     }
+
 
     // User Login
     @PostMapping("/login")
