@@ -1,17 +1,19 @@
+
 package com.realestate.realestateportal.repository;
 
 import com.realestate.realestateportal.model.Property;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class PropertyRepository {
 
     private static final String FILE_PATH = "data/properties.txt";
 
-    // Prevent simultaneous file access
     private static final Object FILE_LOCK = new Object();
 
     // Save a new property
@@ -22,11 +24,14 @@ public class PropertyRepository {
         }
 
         synchronized (FILE_LOCK) {
+
             try {
+
                 File file = new File(FILE_PATH);
                 File parent = file.getParentFile();
 
                 if (parent != null && !parent.exists()) {
+
                     if (!parent.mkdirs() && !parent.exists()) {
                         System.out.println("Unable to create data directory.");
                         return false;
@@ -45,6 +50,7 @@ public class PropertyRepository {
                 return true;
 
             } catch (IOException e) {
+
                 System.out.println("Error saving property: " + e.getMessage());
                 return false;
             }
@@ -78,6 +84,7 @@ public class PropertyRepository {
                     if (parts.length == 11) {
 
                         try {
+
                             Property property = new Property(
                                     parts[0],
                                     parts[1],
@@ -95,15 +102,18 @@ public class PropertyRepository {
                             properties.add(property);
 
                         } catch (NumberFormatException e) {
+
                             System.out.println("Invalid property data: " + line);
                         }
 
                     } else {
+
                         System.out.println("Invalid property record: " + line);
                     }
                 }
 
             } catch (IOException e) {
+
                 System.out.println("Error reading properties: " + e.getMessage());
             }
         }
@@ -151,17 +161,19 @@ public class PropertyRepository {
         return agentProperties;
     }
 
-    // Update an existing property
+    // Update property
     public boolean updateProperty(Property updatedProperty) {
 
         if (updatedProperty == null ||
                 updatedProperty.getPropertyId() == null) {
+
             return false;
         }
 
         synchronized (FILE_LOCK) {
 
             List<Property> properties = getAllProperties();
+
             boolean found = false;
 
             for (int i = 0; i < properties.size(); i++) {
@@ -185,7 +197,7 @@ public class PropertyRepository {
         }
     }
 
-    // Delete a property
+    // Delete property
     public boolean deleteProperty(String propertyId) {
 
         if (propertyId == null || propertyId.trim().isEmpty()) {
@@ -209,16 +221,18 @@ public class PropertyRepository {
         }
     }
 
-    // Rewrite the properties file
+    // Rewrite properties file
     private boolean rewriteFile(List<Property> properties) {
 
         synchronized (FILE_LOCK) {
 
             try {
+
                 File file = new File(FILE_PATH);
                 File parent = file.getParentFile();
 
                 if (parent != null && !parent.exists()) {
+
                     if (!parent.mkdirs() && !parent.exists()) {
                         System.out.println("Unable to create data directory.");
                         return false;
@@ -240,13 +254,14 @@ public class PropertyRepository {
                 return true;
 
             } catch (IOException e) {
+
                 System.out.println("Error updating property file: " + e.getMessage());
                 return false;
             }
         }
     }
 
-    // Convert property object into a text-file record
+    // Convert property object into text record
     private String convertToLine(Property property) {
 
         return property.getPropertyId() + "|" +
