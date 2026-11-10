@@ -180,7 +180,7 @@ public class AgentService extends BaseAgentService {
         return false;
     }
 
-    // Delete Agent Profile
+    // Delete Agent Profile and Related User Account
     @Override
     public String deleteAgentProfile(String agentId) {
 
@@ -188,15 +188,41 @@ public class AgentService extends BaseAgentService {
             return "Invalid agent ID.";
         }
 
-        if (agentBST.search(agentId) == null) {
+        // Search Agent using BST
+        Agent agent = agentBST.search(agentId);
+
+        if (agent == null) {
             return "Agent not found.";
         }
 
-        if (agentRepository.deleteAgent(agentId)) {
-            rebuildAgentBST();
-            return "Agent profile deleted successfully!";
+        // Get related User account before deletion
+        String agentEmail = agent.getEmail();
+        User user = userRepository.findByEmail(agentEmail);
+
+        // Delete Agent profile first
+        if (!agentRepository.deleteAgent(agentId)) {
+            return "Failed to delete agent profile.";
         }
 
-        return "Failed to delete agent profile.";
+        // Delete related User account
+        if (user != null && !userRepository.deleteUser(agentEmail)) {
+
+            // Restore Agent profile if User deletion fails
+            boolean restored = agentRepository.saveAgent(agent);
+            rebuildAgentBST();
+
+            if (restored) {
+                return "User account deletion failed. Agent profile was restored.";
+            }
+
+            return "User account deletion failed and agent profile restoration also failed.";
+        }
+
+        // Update BST after successful deletion
+        rebuildAgentBST();
+
+        return "Agent profile and user account deleted successfully!";
     }
+
+
 }

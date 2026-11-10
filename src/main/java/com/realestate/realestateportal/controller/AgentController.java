@@ -100,7 +100,32 @@ public class AgentController {
 
         return agents;
     }
+    // Delete Own Agent Profile and User Account
+    @DeleteMapping("/my-profile")
+    public String deleteMyProfile(HttpSession session) {
 
+        User user = (User) session.getAttribute("loggedInUser");
+
+        if (user == null || !"AGENT".equals(user.getRole())) {
+            return "Please login as an Agent.";
+        }
+
+        Agent existingAgent =
+                agentService.getAgentByEmail(user.getEmail());
+
+        if (existingAgent == null) {
+            return "Agent profile not found.";
+        }
+
+        String result =
+                agentService.deleteAgentProfile(existingAgent.getAgentId());
+
+        if (result.contains("deleted successfully")) {
+            session.invalidate();
+        }
+
+        return result;
+    }
     // Delete Agent Profile - Admin Only
     @DeleteMapping("/{agentId}")
     public String deleteAgent(
