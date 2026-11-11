@@ -4,6 +4,8 @@ import java.util.Locale;
 
 public class Review {
 
+    // Encapsulation:
+    // Privent private attributes from dirrect acces of outside classe
     private String reviewId;
     private String agentEmail;
     private String clientEmail;
@@ -12,11 +14,13 @@ public class Review {
     private String date;
     private String status;
 
-    // Default Constructor
+    // Default Constructor:
+    // Creates an object without initializing  attribute values.
     public Review() {
     }
 
-    // Parameterized Constructor
+    // Para constructor:
+    // Initialize the Review object with the provided values.
     public Review(String reviewId, String agentEmail,
                   String clientEmail, int rating,
                   String comment, String date, String status) {
@@ -30,7 +34,9 @@ public class Review {
         setStatus(status);
     }
 
-    // Getters and Setters
+    // Getters ,setters:
+    // Provide controlled access to private attributes.
+    // support Encapsulation.
 
     public String getReviewId() {
         return reviewId;
@@ -116,6 +122,8 @@ public class Review {
             );
         }
 
+        // Data validation:
+        // Normalizes the status and check validity
         String normalizedStatus = status.trim().toUpperCase(Locale.ROOT);
 
         if (!normalizedStatus.equals("PENDING")

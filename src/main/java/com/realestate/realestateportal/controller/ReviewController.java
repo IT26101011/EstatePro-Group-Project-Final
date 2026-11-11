@@ -18,6 +18,9 @@ import java.util.ArrayList;
 @RequestMapping("/review")
 public class ReviewController {
 
+    // Encapsulation:
+    // HAS-A RELATIONSHIP: ReviewController has ReviewService,
+    // AppointmentService and AgentService objects.
     private final ReviewService reviewService = new ReviewService();
 
     private final AppointmentService appointmentService =
@@ -25,7 +28,7 @@ public class ReviewController {
 
     private final AgentService agentService = new AgentService();
 
-    // Submit Review - Client Only
+    // Submit Review - (client )
     @PostMapping("/submit")
     public String submitReview(
             @RequestParam String agentEmail,
@@ -33,12 +36,16 @@ public class ReviewController {
             @RequestParam String comment,
             HttpSession session) {
 
+        // Object type casting: Retrieves the logged-in User object
+        // from the session and casts it to the User type.
         User user = (User) session.getAttribute("loggedInUser");
 
         if (user == null || !"CLIENT".equals(user.getRole())) {
             return "Access denied. Please login as a Client.";
         }
 
+        // Object interaction: Uses AppointmentService to retrieve
+        // appointments belonging to the logged-in client.
         List<Appointment> appointments =
                 appointmentService.getClientAppointments(user.getEmail());
 
@@ -65,6 +72,8 @@ public class ReviewController {
         }
 
         try {
+            // Abstraction: Calls the ReviewService method instead of
+            // handling review submission logic directly in the controller.
             reviewService.submitReview(
                     agentEmail,
                     user.getEmail(),
@@ -92,10 +101,11 @@ public class ReviewController {
             return "Access denied. Please login as a Client.";
         }
 
+        // Delegates review retrieval to the ReviewService.
         return reviewService.getReviewsByClient(user.getEmail());
     }
 
-    // Get Agent Reviews - Agent Only
+    // Get Agent Reviews (Agent ge)
     @GetMapping("/agent-reviews")
     public Object getAgentReviews(HttpSession session) {
 
@@ -108,6 +118,8 @@ public class ReviewController {
         List<Review> reviews =
                 reviewService.getReviewsByAgent(user.getEmail());
 
+        // Object creation: Creates an ArrayList object to store
+        // approved Review objects.
         List<Review> approvedReviews = new ArrayList<>();
 
         for (Review review : reviews) {
@@ -120,7 +132,7 @@ public class ReviewController {
         return approvedReviews;
     }
 
-    // Update Review - Client Only
+    // Update Review (Client ge)
     @PostMapping("/update")
     public String updateReview(
             @RequestParam String reviewId,
@@ -135,6 +147,8 @@ public class ReviewController {
         }
 
         try {
+            // OBJECT Intreaction: Calls ReviewService to update
+            // the selected review.
             boolean updated = reviewService.updateReview(
                     reviewId,
                     user.getEmail(),
@@ -151,7 +165,7 @@ public class ReviewController {
         }
     }
 
-    // Delete Review - Client Only
+    // Delete Review (Client ge)
     @PostMapping("/delete")
     public String deleteReview(
             @RequestParam String reviewId,
@@ -163,6 +177,7 @@ public class ReviewController {
             return "Access denied. Please login as a Client.";
         }
 
+        // Delegates review deletion to the ReviewService.
         boolean deleted = reviewService.deleteReview(
                 reviewId,
                 user.getEmail()
@@ -173,7 +188,7 @@ public class ReviewController {
                 : "Review not found or access denied.";
     }
 
-    // Get All Reviews - Admin Only
+    // Get All Reviews ( Admin )
     @GetMapping("/admin/all")
     public Object getAllReviews(HttpSession session) {
 
@@ -183,10 +198,11 @@ public class ReviewController {
             return "Access denied. Admin access required.";
         }
 
+        // Uses ReviewService to retrieve all Review objects.
         return reviewService.getAllReviews();
     }
 
-    // Approve or Reject Review - Admin Only
+    // Approve or Reject Review (Admin)
     @PostMapping("/admin/update-status")
     public String updateReviewStatus(
             @RequestParam String reviewId,
@@ -206,6 +222,7 @@ public class ReviewController {
             return "Invalid review status.";
         }
 
+        // Uses ReviewService to update the review status.
         boolean updated = reviewService.updateReviewStatus(
                 reviewId,
                 status
@@ -222,11 +239,14 @@ public class ReviewController {
 
             if (review.getReviewId().equals(reviewId)) {
 
+                // Object interaction: Uses ReviewService to calculate
+                // the average rating for the relevant agent.
                 double averageRating =
                         reviewService.calculateAverageRating(
                                 review.getAgentEmail()
                         );
 
+                // Uses AgentService to update the agent's average rating.
                 boolean ratingUpdated = agentService.updateAgentRating(
                         review.getAgentEmail(),
                         averageRating

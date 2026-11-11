@@ -9,13 +9,19 @@ import java.util.UUID;
 
 public class ReviewService {
 
+    // Assosiation:
+    // ReviewService has a ReviewRepository object to handle review data.
     private final ReviewRepository reviewRepository;
 
+    // Constructor:
+    // Initializes the ReviewRepository object.
     public ReviewService() {
         this.reviewRepository = new ReviewRepository();
     }
 
     // Submit Review
+    // Object create :
+    // Creates a new Review object using the parameterized constructor.
     public Review submitReview(String agentEmail,
                                String clientEmail,
                                int rating,
@@ -67,7 +73,8 @@ public class ReviewService {
         return review;
     }
 
-    // Get All Reviews
+    // Geting  all reviews
+    // Delegates data retrieval to the ReviewRepository.
     public List<Review> getAllReviews() {
         return reviewRepository.getAllReviews();
     }
@@ -83,6 +90,7 @@ public class ReviewService {
     }
 
     // Update Review
+    // Uses getter and setter methods to access and modify Review attributes.
     public boolean updateReview(String reviewId,
                                 String clientEmail,
                                 int rating,
@@ -175,6 +183,7 @@ public class ReviewService {
     }
 
     // Calculate Average Rating
+    // Uses Review objects and their getter methods to calculate the average rating.
     public double calculateAverageRating(String agentEmail) {
 
         List<Review> reviews = reviewRepository.findByAgentEmail(agentEmail);
