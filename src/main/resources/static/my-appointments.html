@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Appointments | EstatePro</title>
 
-    ```
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -133,6 +131,11 @@
             color: #315c48;
         }
 
+        .CANCELLED {
+            background: #eeeeee;
+            color: #666666;
+        }
+
         .details {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -237,8 +240,6 @@
             }
         }
     </style>
-
-
 </head>
 
 <body>
@@ -250,13 +251,11 @@
 
 <div class="container">
 
-
     <h1>My Appointments</h1>
     <p class="subtitle">Manage your property appointments.</p>
 
     <div id="message"></div>
     <div id="appointments">Loading appointments...</div>
-
 
 </div>
 
@@ -267,18 +266,29 @@
         container.textContent = "Loading appointments...";
 
         try {
-            const response = await fetch("/appointment/my-appointments");
+            const response = await fetch("/appointment/my-appointments", {
+                cache: "no-store"
+            });
+
+            if (!response.ok) {
+                throw new Error("Unable to load appointments. Please login as Client.");
+            }
+
             const result = await response.json();
 
-            if (!response.ok || !Array.isArray(result)) {
-                throw new Error("Unable to load appointments. Please login as Client.");
+            if (!Array.isArray(result)) {
+                throw new Error("Invalid appointment response.");
             }
 
             container.innerHTML = "";
 
             if (result.length === 0) {
-                container.innerHTML =
-                    '<div class="empty"><h3>No Appointments Found</h3><p>You have not booked any appointments yet.</p></div>';
+                container.innerHTML = `
+                    <div class="empty">
+                        <h3>No Appointments Found</h3>
+                        <p>You have not booked any appointments yet.</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -292,6 +302,7 @@
     }
 
     async function displayAppointment(appointment) {
+
         let title = appointment.propertyId;
         let location = "Not available";
 
@@ -302,9 +313,11 @@
 
             if (response.ok) {
                 const property = await response.json();
+
                 title = property.title || title;
                 location = property.location || location;
             }
+
         } catch (error) {
             console.log("Property details unavailable.");
         }
@@ -327,7 +340,15 @@
         heading.append(propertyTitle, id);
 
         const status = document.createElement("span");
-        const validStatuses = ["PENDING", "APPROVED", "REJECTED", "COMPLETED"];
+
+        const validStatuses = [
+            "PENDING",
+            "APPROVED",
+            "REJECTED",
+            "COMPLETED",
+            "CANCELLED"
+        ];
+
         const currentStatus = validStatuses.includes(appointment.status)
             ? appointment.status
             : "PENDING";
@@ -349,17 +370,21 @@
 
         card.appendChild(details);
 
+        // Only pending appointments can be edited or cancelled.
         if (currentStatus === "PENDING") {
+
             const edit = document.createElement("button");
             edit.className = "edit-btn";
             edit.textContent = "Edit";
+
             edit.onclick = function () {
                 editAppointment(appointment);
             };
 
             const cancel = document.createElement("button");
             cancel.className = "cancel-btn";
-            cancel.textContent = "Cancel";
+            cancel.textContent = "Delete / Cancel";
+
             cancel.onclick = function () {
                 cancelAppointment(appointment.appointmentId);
             };
@@ -371,6 +396,7 @@
     }
 
     function addDetail(parent, label, value) {
+
         const div = document.createElement("div");
         div.className = "detail";
 
@@ -385,36 +411,59 @@
     }
 
     async function editAppointment(appointment) {
-        const date = prompt("New date (YYYY-MM-DD):", appointment.appointmentDate);
+
+        const date = prompt(
+            "Enter new date (YYYY-MM-DD):",
+            appointment.appointmentDate
+        );
+
         if (date === null) return;
 
-        const time = prompt("New time (HH:MM):", appointment.appointmentTime);
+        const time = prompt(
+            "Enter new time (HH:MM):",
+            appointment.appointmentTime
+        );
+
         if (time === null) return;
 
-        const message = prompt("Message:", appointment.message || "");
+        const message = prompt(
+            "Enter your message:",
+            appointment.message || ""
+        );
+
         if (message === null) return;
 
-        const data = new URLSearchParams();
-        data.append("appointmentId", appointment.appointmentId);
-        data.append("appointmentDate", date);
-        data.append("appointmentTime", time);
-        data.append("message", message);
-
-        sendRequest("/appointment/update", data);
-    }
-
-    async function cancelAppointment(id) {
-        if (!confirm("Are you sure you want to cancel this appointment?")) {
+        if (!date.trim() || !time.trim()) {
+            showMessage("Please enter a valid date and time.", false);
             return;
         }
 
         const data = new URLSearchParams();
+
+        data.append("appointmentId", appointment.appointmentId);
+        data.append("appointmentDate", date.trim());
+        data.append("appointmentTime", time.trim());
+        data.append("message", message);
+
+        await sendRequest("/appointment/update", data);
+    }
+
+    async function cancelAppointment(id) {
+
+        const confirmed = confirm(
+            "Are you sure you want to cancel this appointment?"
+        );
+
+        if (!confirmed) return;
+
+        const data = new URLSearchParams();
         data.append("appointmentId", id);
 
-        sendRequest("/appointment/delete", data);
+        await sendRequest("/appointment/delete", data);
     }
 
     async function sendRequest(url, data) {
+
         try {
             const response = await fetch(url, {
                 method: "POST",
@@ -425,21 +474,27 @@
             });
 
             const result = await response.text();
-            const message = document.getElementById("message");
 
-            message.textContent = result;
-            message.style.color = result.includes("successfully")
-                ? "#087443"
-                : "#b42318";
+            const successful = response.ok &&
+                result.toLowerCase().includes("successfully");
 
-            if (result.includes("successfully")) {
-                loadAppointments();
+            showMessage(result, successful);
+
+            if (successful) {
+                await loadAppointments();
             }
 
         } catch (error) {
-            document.getElementById("message").textContent =
-                "Request failed. Please try again.";
+            showMessage("Request failed. Please try again.", false);
         }
+    }
+
+    function showMessage(text, success) {
+
+        const message = document.getElementById("message");
+
+        message.textContent = text;
+        message.style.color = success ? "#087443" : "#b42318";
     }
 
     loadAppointments();
