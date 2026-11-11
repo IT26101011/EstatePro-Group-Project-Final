@@ -1,5 +1,5 @@
 
-package com.realestate.realestateportal.controller;
+        package com.realestate.realestateportal.controller;
 
 import com.realestate.realestateportal.model.Property;
 import com.realestate.realestateportal.model.User;
@@ -69,6 +69,7 @@ public class PropertyController {
     }
 
     // FILTER PROPERTIES BY MULTIPLE CRITERIA
+    // Public endpoint - Login is not required for searching
     @GetMapping("/filter")
     public Object filterProperties(
 
@@ -88,15 +89,7 @@ public class PropertyController {
 
             @RequestParam(required = false) Double minArea,
 
-            @RequestParam(required = false) Double maxArea,
-
-            HttpSession session) {
-
-        User user = (User) session.getAttribute("loggedInUser");
-
-        if (user == null) {
-            return "Please login first.";
-        }
+            @RequestParam(required = false) Double maxArea) {
 
         return propertyService.filterProperties(
                 propertyType,
