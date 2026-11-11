@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,8 +34,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: white;
-        }
+            background: white;}
+
 
         .logo {
             font-size: 27px;
@@ -170,6 +171,15 @@
             font-weight: 700;
         }
 
+        .search-btn:hover {
+            background: #23644f;
+        }
+
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* GENERAL SECTION */
 
         .section {
@@ -280,6 +290,26 @@
             font-size: 21px;
             font-weight: 800;
             margin-bottom: 15px;
+        }
+
+        /* SEARCH RESULTS */
+
+        .search-results-section {
+            padding: 65px 8% 30px;
+        }
+
+        .search-results-section[hidden] {
+            display: none;
+        }
+
+        .search-message {
+            color: #64736b;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .search-results-section .property-grid:empty {
+            display: none;
         }
 
         /* WHY US */
@@ -450,56 +480,75 @@
     <div class="search-box">
 
         <div class="search-field">
-            <label>LOCATION</label>
+            <label for="searchLocation">LOCATION</label>
 
-            <select>
-                <option>Select Location</option>
-                <option>Colombo</option>
-                <option>Negombo</option>
-                <option>Gampaha</option>
-                <option>Kandy</option>
+            <select id="searchLocation">
+                <option value="">Select Location</option>
+                <option value="Colombo">Colombo</option>
+                <option value="Negombo">Negombo</option>
+                <option value="Gampaha">Gampaha</option>
+                <option value="Kandy">Kandy</option>
             </select>
         </div>
 
         <div class="search-field">
-            <label>PROPERTY TYPE</label>
+            <label for="searchPropertyType">PROPERTY TYPE</label>
 
-            <select>
-                <option>Any Property</option>
-                <option>House</option>
-                <option>Apartment</option>
-                <option>Land</option>
-                <option>Commercial</option>
+            <select id="searchPropertyType">
+                <option value="">Any Property</option>
+                <option value="House">House</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Land">Land</option>
+                <option value="Commercial">Commercial</option>
             </select>
         </div>
 
         <div class="search-field">
-            <label>MINIMUM PRICE</label>
+            <label for="minPrice">MINIMUM PRICE</label>
 
-            <select>
-                <option>No Minimum</option>
-                <option>5 Million</option>
-                <option>10 Million</option>
-                <option>20 Million</option>
+            <select id="minPrice">
+                <option value="">No Minimum</option>
+                <option value="5000000">5 Million</option>
+                <option value="10000000">10 Million</option>
+                <option value="20000000">20 Million</option>
             </select>
         </div>
 
         <div class="search-field">
-            <label>MAXIMUM PRICE</label>
+            <label for="maxPrice">MAXIMUM PRICE</label>
 
-            <select>
-                <option>No Maximum</option>
-                <option>20 Million</option>
-                <option>50 Million</option>
-                <option>100 Million</option>
+            <select id="maxPrice">
+                <option value="">No Maximum</option>
+                <option value="20000000">20 Million</option>
+                <option value="50000000">50 Million</option>
+                <option value="100000000">100 Million</option>
             </select>
         </div>
 
-        <button class="search-btn" type="button">
+        <button class="search-btn" id="searchButton" type="button">
             Search
         </button>
 
     </div>
+
+</section>
+
+<!-- SEARCH RESULTS -->
+
+<section class="search-results-section" id="searchResultsSection" hidden>
+
+    <div class="section-heading">
+
+        <div>
+            <h2>Search Results</h2>
+            <p>Properties matching your search criteria.</p>
+        </div>
+
+    </div>
+
+    <p class="search-message" id="searchMessage" aria-live="polite"></p>
+
+    <div class="property-grid" id="searchResults"></div>
 
 </section>
 
@@ -661,6 +710,11 @@
 
 </footer>
 
+<!-- PROPERTY SEARCH JAVASCRIPT -->
+
+<script src="/property-search.js"></script>
+
 </body>
 
 </html>
+```
