@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | EstatePro</title>
+
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: #f5f7f5;
+        }
+
+        .left-panel {
+            width: 50%;
+            background: linear-gradient(135deg, #123b30, #071f19);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 70px;
+        }
+
+        .brand {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 70px;
+        }
+
+        .brand span {
+            color: #d9b66f;
+        }
+
+        .left-panel h1 {
+            font-size: 46px;
+            line-height: 1.2;
+            margin-bottom: 22px;
+        }
+
+        .left-panel p {
+            color: #c5d5ce;
+            line-height: 1.8;
+            max-width: 420px;
+        }
+
+        .right-panel {
+            width: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 430px;
+        }
+
+        .login-box h2 {
+            font-size: 32px;
+            color: #173d32;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 9px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1c604b;
+        }
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 25px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .remember input {
+            width: auto;
+        }
+
+        a {
+            color: #1c604b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #174b3b;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background: #10372a;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #message {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .register-text {
+            text-align: center;
+            margin-top: 28px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .alert {
+            padding: 15px 18px;
+            margin-bottom: 25px;
+            border-radius: 9px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .alert-success {
+            background: #e8f5ed;
+            color: #17633d;
+            border: 1px solid #b7dfc6;
+        }
+
+        .d-none {
+            display: none;
+        }
+
+        @media(max-width: 768px) {
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                width: 100%;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<div class="left-panel">
+
+
+    <div class="brand">Estate<span>Pro.</span></div>
+
+    <h1>Welcome Back to Your Dream Property Journey.</h1>
+
+    <p>
+        Find trusted real estate agents, explore amazing properties
+        and manage your appointments in one convenient place.
+    </p>
+
+
+</div>
+
+<div class="right-panel">
+
+
+    <div class="login-box">
+
+        <h2>Welcome Back!</h2>
+
+        <p class="subtitle">
+            Please enter your details to sign in.
+        </p>
+
+        <form id="loginForm">
+
+            <div id="logoutMessage"
+                 class="alert alert-success text-center d-none"
+                 role="alert">
+                <strong>Logged Out Successfully!</strong>
+                <br>
+                You have been safely logged out of your EstatePro account.
+            </div>
+
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email"
+                       name="email"
+                       placeholder="Enter your email"
+                       required>
+
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password"
+                       name="password"
+                       placeholder="Enter your password"
+                       required>
+            </div>
+
+            <div class="options">
+
+                <label class="remember">
+                    <input type="checkbox">
+                    Remember me
+                </label>
+
+                <a href="#">Forgot Password?</a>
+
+            </div>
+
+            <button type="submit" class="login-btn" id="loginButton">
+                Sign In
+            </button>
+
+            <p id="message"></p>
+
+        </form>
+
+        <p class="register-text">
+            Don't have an account?
+            <a href="register.html">Create Account</a>
+        </p>
+
+    </div>
+
+
+</div>
+
+<script>
+
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const message = document.getElementById("message");
+        const button = document.getElementById("loginButton");
+
+        const formData = new FormData(loginForm);
+
+        button.disabled = true;
+        button.textContent = "Signing In...";
+
+        message.textContent = "";
+
+        try {
+
+            const response = await fetch("/login", {
+                method: "POST",
+                body: new URLSearchParams(formData)
+            });
+
+            const result = await response.text();
+
+            if (response.ok && result.startsWith("Login successful!")) {
+
+                message.style.color = "green";
+                message.textContent = result;
+
+                if (result.includes("CLIENT")) {
+
+                    setTimeout(function() {
+                        window.location.href = "/client-dashboard.html";
+                    }, 700);
+
+                } else if (result.includes("AGENT")) {
+
+                    setTimeout(function() {
+                        window.location.href = "/agent-dashboard.html";
+                    }, 700);
+
+                } else if (result.includes("ADMIN")) {
+
+                    setTimeout(function() {
+                        window.location.href = "/admin-dashboard.html";
+                    }, 700);
+
+                }
+
+            } else {
+
+                message.style.color = "red";
+                message.textContent = result;
+
+                button.disabled = false;
+                button.textContent = "Sign In";
+
+            }
+
+        } catch (error) {
+
+            message.style.color = "red";
+            message.textContent = "Something went wrong. Please try again.";
+
+            button.disabled = false;
+            button.textContent = "Sign In";
+
+        }
+
+    });
+
+    // Display logout success message
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.get("logout") === "success") {
+
+        const logoutMessage = document.getElementById("logoutMessage");
+
+        logoutMessage.classList.remove("d-none");
+
+        // Remove logout parameter from URL
+        window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+        );
+    }
+
+</script>
+
+</body>
+</html>

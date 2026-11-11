@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users | EstatePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <div class="header-links">
+        <a href="/admin-dashboard.html">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Manage Users</h1>
+    <p class="subtitle">View all users, change roles or remove accounts.</p>
+
+    <div id="message"></div>
+    <div class="table-box" id="tableBox">Loading...</div>
+</div>
+
+<script src="/admin.js"></script>
+<script>
+
+    const box = document.getElementById("tableBox");
+
+    async function loadUsers() {
+
+        try {
+
+            const users = await getList("/admin/users");
+
+            if (users.length === 0) {
+                showEmpty(box, "No users found.");
+                return;
+            }
+
+            buildTable(box,
+                ["Full Name", "Email", "Phone", "Role", "Actions"],
+                users,
+                function (row, user) {
+
+                    makeCell(row, user.fullName);
+                    makeCell(row, user.email);
+                    makeCell(row, user.phone);
+
+                    // Role dropdown
+                    const roleCell = document.createElement("td");
+                    const select = document.createElement("select");
+
+                    for (const role of ["CLIENT", "AGENT", "ADMIN"]) {
+                        const option = document.createElement("option");
+                        option.value = role;
+                        option.textContent = role;
+                        option.selected = (role === user.role);
+                        select.appendChild(option);
+                    }
+
+                    roleCell.appendChild(select);
+                    row.appendChild(roleCell);
+
+                    // Buttons
+                    const actionCell = document.createElement("td");
+
+                    actionCell.appendChild(makeButton("Update Role", "green-btn", function () {
+                        changeRole(user.email, select.value);
+                    }));
+
+                    actionCell.appendChild(makeButton("Delete", "red-btn", function () {
+                        deleteUser(user.email);
+                    }));
+
+                    row.appendChild(actionCell);
+                });
+
+        } catch (error) {
+            showEmpty(box, error.message);
+        }
+    }
+
+    async function changeRole(email, role) {
+
+        if (!confirm("Change role of " + email + " to " + role + "?")) {
+            return;
+        }
+
+        const result = await postForm("/admin/update-role", { email: email, role: role });
+
+        showMessage(result, result.includes("successfully"));
+        loadUsers();
+    }
+
+    async function deleteUser(email) {
+
+        if (!confirm("Delete user " + email + "?")) {
+            return;
+        }
+
+        const result = await postForm("/admin/delete-user", { email: email });
+
+        showMessage(result, result.includes("successfully"));
+        loadUsers();
+    }
+
+    loadUsers();
+
+</script>
+</body>
+</html>

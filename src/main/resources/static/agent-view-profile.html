@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Agent Profile | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f4f6f4;
+            color: #26352d;
+        }
+
+        header {
+            background: #123c2d;
+            padding: 18px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: #d5b56b;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        h1 {
+            color: #123c2d;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .detail-label {
+            font-weight: 700;
+            color: #123c2d;
+        }
+
+        .detail-value {
+            color: #555;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .update-btn {
+            background: #1d704c;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        #message {
+            color: #777;
+            text-align: center;
+            padding: 25px 0;
+        }
+
+        @media(max-width: 600px) {
+            .profile-card {
+                padding: 25px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .detail-value {
+                text-align: left;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">EstatePro</div>
+    <a href="/agent-dashboard.html">Dashboard</a>
+</header>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <h1>My Agent Profile</h1>
+
+        <p class="subtitle">
+            View and manage your professional agent information.
+        </p>
+
+        <div id="profileDetails">
+            <p id="message">Loading your profile...</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    // Load Agent Profile
+    async function loadProfile() {
+
+        const container = document.getElementById("profileDetails");
+
+        try {
+
+            const response = await fetch("/agent/my-profile");
+
+            const contentType = response.headers.get("content-type") || "";
+
+            if (!response.ok || !contentType.includes("application/json")) {
+                const message = await response.text();
+
+                container.innerHTML =
+                    '<p id="message">' + escapeHTML(message) + '</p>';
+
+                return;
+            }
+
+            const result = await response.json();
+
+            if (!result || !result.agentId) {
+
+                container.innerHTML =
+                    '<p id="message">Agent profile not found.</p>';
+
+                return;
+            }
+
+            container.innerHTML = `
+
+                <div class="detail-row">
+                    <span class="detail-label">Agent ID</span>
+                    <span class="detail-value">${escapeHTML(result.agentId)}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">${escapeHTML(result.email)}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Agency Name</span>
+                    <span class="detail-value">${escapeHTML(result.agencyName)}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Specialization</span>
+                    <span class="detail-value">${escapeHTML(result.specialization)}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Location</span>
+                    <span class="detail-value">${escapeHTML(result.location)}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Experience</span>
+                    <span class="detail-value">${escapeHTML(result.experienceYears)} years</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Description</span>
+                    <span class="detail-value">${escapeHTML(result.description)}</span>
+                </div>
+
+                <div class="detail-row">
+                    <span class="detail-label">Rating</span>
+                    <span class="detail-value">${escapeHTML(result.rating)}</span>
+                </div>
+
+                <div class="actions">
+
+                    <a href="/agent-update-profile.html"
+                       class="btn update-btn">
+                        Update Profile
+                    </a>
+
+                    <button class="btn delete-btn"
+                            onclick="deleteProfile()">
+                        Delete Profile
+                    </button>
+
+                </div>
+            `;
+
+        } catch (error) {
+
+            container.innerHTML =
+                '<p id="message">Unable to load profile. Please try again.</p>';
+
+            console.error(error);
+        }
+    }
+
+
+    // Delete Agent Profile and User Account
+    async function deleteProfile() {
+
+        const confirmDelete = confirm(
+            "Are you sure you want to delete your Agent profile and User account? This action cannot be undone."
+        );
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch("/agent/my-profile", {
+                method: "DELETE"
+            });
+
+            const result = await response.text();
+
+            if (response.ok && result.includes("deleted successfully")) {
+
+                alert(result);
+
+                window.location.href = "/login.html";
+
+            } else {
+
+                alert(result);
+
+            }
+
+        } catch (error) {
+
+            alert("Unable to delete account. Please try again.");
+
+            console.error(error);
+        }
+    }
+
+
+    // Escape HTML values
+    function escapeHTML(value) {
+
+        if (value === null || value === undefined) {
+            return "";
+        }
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    loadProfile();
+
+</script>
+
+</body>
+</html>
+```

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | EstatePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <div class="header-links">
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <h1>Admin Dashboard</h1>
+    <p class="subtitle">Overview of everything happening in EstatePro.</p>
+
+    <div id="message"></div>
+
+    <!-- Statistics -->
+    <div class="cards">
+        <div class="card stat"><div class="number" id="totalUsers">-</div><div class="label">Total Users</div></div>
+        <div class="card stat"><div class="number" id="totalClients">-</div><div class="label">Clients</div></div>
+        <div class="card stat"><div class="number" id="totalAgents">-</div><div class="label">Agents</div></div>
+        <div class="card stat"><div class="number" id="totalProperties">-</div><div class="label">Properties</div></div>
+        <div class="card stat"><div class="number" id="totalAppointments">-</div><div class="label">Appointments</div></div>
+        <div class="card stat"><div class="number" id="pendingReviews">-</div><div class="label">Pending Reviews</div></div>
+        <div class="card stat"><div class="number" id="totalActivities">-</div><div class="label">Admin Actions</div></div>
+    </div>
+
+    <!-- Management links -->
+    <div class="cards">
+
+        <div class="card">
+            <h3>Manage Users</h3>
+            <p>View users, change roles and delete accounts.</p>
+            <a href="/admin-users.html">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Manage Agents</h3>
+            <p>View agent profiles and remove them if needed.</p>
+            <a href="/admin-agents.html">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Manage Properties</h3>
+            <p>Monitor all property listings.</p>
+            <a href="/admin-properties.html">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Manage Appointments</h3>
+            <p>Monitor appointments between clients and agents.</p>
+            <a href="/admin-appointments.html">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Manage Reviews</h3>
+            <p>Approve or reject client reviews.</p>
+            <a href="/admin-reviews.html">Open</a>
+        </div>
+
+        <div class="card">
+            <h3>Activity Log</h3>
+            <p>See what admins have changed in the system.</p>
+            <a href="/admin-activity.html">Open</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/admin.js"></script>
+<script>
+
+    async function loadStats() {
+
+        try {
+
+            const response = await fetch("/admin/stats");
+            const stats = await response.json();
+
+            const ids = ["totalUsers", "totalClients", "totalAgents",
+                         "totalProperties", "totalAppointments", "pendingReviews", "totalActivities"];
+
+            for (const id of ids) {
+                document.getElementById(id).textContent = stats[id];
+            }
+
+        } catch (error) {
+            showMessage("Unable to load statistics. Please login as Admin.", false);
+        }
+    }
+
+    loadStats();
+
+</script>
+</body>
+</html>

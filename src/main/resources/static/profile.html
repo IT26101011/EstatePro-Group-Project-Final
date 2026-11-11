@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Profile | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .back {
+            color: #123c2d;
+            background: #d5b56b;
+            padding: 10px 20px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 55px auto;
+            padding: 0 20px;
+        }
+
+        .profile-card {
+            background: white;
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .profile-item {
+            padding: 18px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-item label {
+            display: block;
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .profile-item p {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .role {
+            display: inline-block;
+            background: #e7f1eb;
+            color: #123c2d;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .message {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+        }
+
+        .error {
+            color: #c0392b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+
+        .edit-profile-btn {
+            display: inline-block;
+            padding: 11px 24px;
+            background: #c9a227;
+            color: #171717;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #c9a227;
+            transition: all 0.3s ease;
+        }
+
+        .edit-profile-btn:hover {
+            background: #171717;
+            color: #c9a227;
+            border-color: #171717;
+            transform: translateY(-2px);
+        }
+
+        .delete-section {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .delete-section h3 {
+            color: #c0392b;
+            margin-bottom: 10px;
+        }
+
+        .delete-section p {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .delete-btn {
+            padding: 11px 22px;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #922b21;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 430px;
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .modal-content h2 {
+            color: #c0392b;
+            margin-bottom: 12px;
+        }
+
+        .modal-content p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-content label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            margin-bottom: 15px;
+            outline: none;
+        }
+
+        .modal-content input:focus {
+            border-color: #123c2d;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .cancel-btn {
+            padding: 10px 18px;
+            background: #eee;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        .confirm-delete-btn {
+            padding: 10px 18px;
+            background: #c0392b;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .confirm-delete-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        #deleteMessage {
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .profile-card {
+                padding: 25px;
+            }
+
+            header {
+                padding: 18px 5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+
+    <div class="header-actions">
+        <a href="/client-dashboard.html" class="back">
+            Back to Dashboard
+        </a>
+
+        <a href="/edit-profile.html" class="edit-profile-btn">
+            ✎ Edit Profile
+        </a>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="profile-card">
+
+        <h1>My Profile</h1>
+
+        <p class="subtitle">
+            View your personal account information.
+        </p>
+
+        <div id="loading" class="message">
+            Loading your profile...
+        </div>
+
+        <div id="profileDetails" style="display:none;">
+
+            <div class="profile-item">
+                <label>Full Name</label>
+                <p id="fullName"></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Email Address</label>
+                <p id="email"></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Phone Number</label>
+                <p id="phone"></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Account Role</label>
+                <p><span class="role" id="role"></span></p>
+            </div>
+
+            <div class="profile-item">
+                <label>Account Type</label>
+                <p id="accountDescription"></p>
+            </div>
+
+            <div class="delete-section" id="deleteSection"
+                 style="display:none;">
+
+                <h3>Delete Account</h3>
+
+                <p>
+                    Deleting your account is permanent.
+                    All your account information will be removed
+                    and you will be logged out.
+                </p>
+
+                <button class="delete-btn"
+                        onclick="openDeleteModal()">
+                    Delete My Account
+                </button>
+
+            </div>
+
+        </div>
+
+        <div id="errorMessage" class="message error"
+             style="display:none;">
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Delete Account Confirmation Modal -->
+
+<div class="modal" id="deleteModal">
+
+    <div class="modal-content">
+
+        <h2>Delete Account?</h2>
+
+        <p>
+            Are you sure you want to permanently delete your account?
+            This action cannot be undone.
+            Please enter your current password to confirm.
+        </p>
+
+        <form id="deleteForm">
+
+            <label for="currentPassword">
+                Current Password
+            </label>
+
+            <input type="password"
+                   id="currentPassword"
+                   name="currentPassword"
+                   placeholder="Enter your current password"
+                   required>
+
+            <div id="deleteMessage"></div>
+
+            <div class="modal-actions">
+
+                <button type="button"
+                        class="cancel-btn"
+                        onclick="closeDeleteModal()">
+                    Cancel
+                </button>
+
+                <button type="submit"
+                        class="confirm-delete-btn"
+                        id="confirmDeleteBtn">
+                    Confirm Delete
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    async function loadProfile() {
+
+        try {
+
+            const response = await fetch("/profile");
+
+            const data = await response.json();
+
+            document.getElementById("loading").style.display = "none";
+
+            if (!response.ok || data.error) {
+
+                document.getElementById("errorMessage").textContent =
+                    data.error || "Unable to load profile.";
+
+                document.getElementById("errorMessage").style.display = "block";
+
+                return;
+            }
+
+            document.getElementById("fullName").textContent = data.fullName;
+            document.getElementById("email").textContent = data.email;
+            document.getElementById("phone").textContent = data.phone;
+            document.getElementById("role").textContent = data.role;
+            document.getElementById("accountDescription").textContent = data.accountDescription;
+
+            document.getElementById("profileDetails").style.display = "block";
+
+            // Only CLIENT users can delete their own accounts
+            if (data.role === "CLIENT") {
+                document.getElementById("deleteSection").style.display = "block";
+            }
+
+        } catch (error) {
+
+            document.getElementById("loading").style.display = "none";
+
+            document.getElementById("errorMessage").textContent =
+                "Something went wrong. Please try again.";
+
+            document.getElementById("errorMessage").style.display = "block";
+        }
+    }
+
+    function openDeleteModal() {
+
+        document.getElementById("deleteModal").style.display = "flex";
+
+        document.getElementById("currentPassword").value = "";
+
+        document.getElementById("deleteMessage").textContent = "";
+
+        document.getElementById("currentPassword").focus();
+    }
+
+    function closeDeleteModal() {
+
+        document.getElementById("deleteModal").style.display = "none";
+    }
+
+    document.getElementById("deleteForm").addEventListener("submit",
+        async function(event) {
+
+            event.preventDefault();
+
+            const password =
+                document.getElementById("currentPassword").value;
+
+            const message =
+                document.getElementById("deleteMessage");
+
+            const button =
+                document.getElementById("confirmDeleteBtn");
+
+            const formData = new URLSearchParams();
+
+            formData.append("currentPassword", password);
+
+            button.disabled = true;
+            button.textContent = "Deleting...";
+
+            message.style.color = "#777";
+            message.textContent = "Please wait...";
+
+            try {
+
+                const response = await fetch("/profile/delete", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+
+                    body: formData
+
+                });
+
+                const result = await response.text();
+
+                if (result === "Account deleted successfully!") {
+
+                    message.style.color = "green";
+                    message.textContent = result;
+
+                    setTimeout(function() {
+
+                        window.location.href =
+                            "/login.html?deleted=success";
+
+                    }, 1200);
+
+                } else {
+
+                    message.style.color = "#c0392b";
+                    message.textContent = result;
+
+                    button.disabled = false;
+                    button.textContent = "Confirm Delete";
+                }
+
+            } catch (error) {
+
+                message.style.color = "#c0392b";
+                message.textContent =
+                    "Something went wrong. Please try again.";
+
+                button.disabled = false;
+                button.textContent = "Confirm Delete";
+            }
+
+        }
+    );
+
+    loadProfile();
+
+</script>
+
+</body>
+</html>
