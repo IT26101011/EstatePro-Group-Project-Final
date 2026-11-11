@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Appointments | EstatePro</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    body {
+      background: #f5f7f5;
+      color: #18352b;
+    }
+
+    header {
+      background: #123c2d;
+      padding: 20px 7%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      color: white;
+      font-size: 25px;
+      font-weight: 800;
+    }
+
+    .back-btn {
+      background: #d5b56b;
+      color: #123c2d;
+      padding: 11px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 45px auto;
+      padding: 0 20px;
+    }
+
+    h1 {
+      color: #123c2d;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: #778078;
+      margin-bottom: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+
+    .refresh-info {
+      color: #839087;
+      font-size: 13px;
+    }
+
+    .refresh-btn {
+      background: #123c2d;
+      color: white;
+      padding: 11px 20px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 700;
+      border: none;
+    }
+
+    .refresh-btn:hover {
+      background: #1d704c;
+    }
+
+    .refresh-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      box-shadow: 0 5px 20px rgba(18,60,45,0.06);
+      border: 1px solid #e9eee9;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+
+    .property-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #123c2d;
+    }
+
+    .appointment-id {
+      color: #879188;
+      font-size: 12px;
+    }
+
+    .status {
+      padding: 7px 13px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .PENDING {
+      background: #fff3d5;
+      color: #946900;
+    }
+
+    .APPROVED {
+      background: #dff3e7;
+      color: #087443;
+    }
+
+    .REJECTED {
+      background: #fee5e2;
+      color: #b42318;
+    }
+
+    .COMPLETED {
+      background: #e5eee9;
+      color: #315c48;
+    }
+
+    .CANCELLED {
+      background: #f1e5e5;
+      color: #a12b2b;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      background: #f8faf8;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .detail {
+      color: #839087;
+      font-size: 13px;
+    }
+
+    .detail strong {
+      display: block;
+      color: #18352b;
+      margin-top: 6px;
+      overflow-wrap: anywhere;
+    }
+
+    button {
+      border: none;
+      padding: 11px 20px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 700;
+      margin-right: 8px;
+      transition: 0.3s;
+    }
+
+    .approve-btn {
+      background: #123c2d;
+      color: white;
+    }
+
+    .approve-btn:hover {
+      background: #1d704c;
+    }
+
+    .reject-btn {
+      background: #fff0ed;
+      color: #b42318;
+    }
+
+    .reject-btn:hover {
+      background: #fbdad5;
+    }
+
+    .empty {
+      background: white;
+      padding: 40px;
+      text-align: center;
+      border-radius: 14px;
+    }
+
+    #message {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    @media(max-width: 600px) {
+      .details {
+        grid-template-columns: 1fr;
+      }
+
+      .card-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">EstatePro</div>
+  <a href="/agent-dashboard.html" class="back-btn">Dashboard</a>
+</header>
+
+<div class="container">
+
+  <h1>Manage Appointments</h1>
+
+  <p class="subtitle">
+    View and manage appointment requests from clients.
+  </p>
+
+  <div class="toolbar">
+
+    <div class="refresh-info" id="refreshInfo">
+      Loading appointments...
+    </div>
+
+    <button
+            type="button"
+            class="refresh-btn"
+            id="refreshBtn"
+            onclick="loadAppointments(true)">
+      ↻ Refresh
+    </button>
+
+  </div>
+
+  <div id="message"></div>
+
+  <div id="appointments">
+    Loading appointments...
+  </div>
+
+</div>
+
+<script>
+
+  const container = document.getElementById("appointments");
+  const messageElement = document.getElementById("message");
+  const refreshInfo = document.getElementById("refreshInfo");
+  const refreshBtn = document.getElementById("refreshBtn");
+
+  let isLoading = false;
+  let isFirstLoad = true;
+
+  // Load Agent Appointments
+  async function loadAppointments(manualRefresh = false) {
+
+    if (isLoading) {
+      return;
+    }
+
+    isLoading = true;
+    refreshBtn.disabled = true;
+
+    if (isFirstLoad) {
+      container.textContent = "Loading appointments...";
+    }
+
+    if (manualRefresh) {
+      refreshInfo.textContent = "Refreshing appointments...";
+    }
+
+    try {
+
+      const response = await fetch("/appointment/agent-appointments", {
+        cache: "no-store"
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !Array.isArray(result)) {
+        throw new Error(
+                "Unable to load appointments. Please login as Agent."
+        );
+      }
+
+      container.innerHTML = "";
+
+      if (result.length === 0) {
+
+        container.innerHTML = `
+                    <div class="empty">
+                        <h3>No Appointments Found</h3>
+                        <p>You have no appointment requests yet.</p>
+                    </div>
+                `;
+
+      } else {
+
+        for (const appointment of result) {
+          await displayAppointment(appointment);
+        }
+
+      }
+
+      refreshInfo.textContent =
+              "Last updated: " + new Date().toLocaleTimeString();
+
+      isFirstLoad = false;
+
+    } catch (error) {
+
+      console.error(error);
+
+      if (isFirstLoad || manualRefresh) {
+        container.textContent = error.message;
+      }
+
+      refreshInfo.textContent = "Unable to refresh appointments.";
+
+    } finally {
+
+      isLoading = false;
+      refreshBtn.disabled = false;
+
+    }
+  }
+
+
+  // Display Individual Appointment
+  async function displayAppointment(appointment) {
+
+    let title = appointment.propertyId;
+    let location = "Not available";
+
+    try {
+
+      const response = await fetch(
+              "/property/" + encodeURIComponent(appointment.propertyId),
+              {
+                cache: "no-store"
+              }
+      );
+
+      if (response.ok) {
+
+        const property = await response.json();
+
+        title = property.title || title;
+        location = property.location || location;
+
+      }
+
+    } catch (error) {
+
+      console.log("Property details unavailable.");
+
+    }
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const header = document.createElement("div");
+    header.className = "card-header";
+
+    const heading = document.createElement("div");
+
+    const propertyTitle = document.createElement("div");
+    propertyTitle.className = "property-title";
+    propertyTitle.textContent = title;
+
+    const id = document.createElement("small");
+    id.className = "appointment-id";
+    id.textContent = "Appointment ID: " + appointment.appointmentId;
+
+    heading.append(propertyTitle, id);
+
+    const status = document.createElement("span");
+
+    const validStatuses = [
+      "PENDING",
+      "APPROVED",
+      "REJECTED",
+      "COMPLETED",
+      "CANCELLED"
+    ];
+
+    const currentStatus = validStatuses.includes(appointment.status)
+            ? appointment.status
+            : "UNKNOWN";
+
+    status.className = "status " + currentStatus;
+    status.textContent = currentStatus;
+
+    header.append(heading, status);
+    card.appendChild(header);
+
+    const details = document.createElement("div");
+    details.className = "details";
+
+    addDetail(details, "Location", location);
+    addDetail(details, "Client Email", appointment.clientEmail);
+    addDetail(details, "Date", appointment.appointmentDate);
+    addDetail(details, "Time", appointment.appointmentTime);
+    addDetail(details, "Message", appointment.message || "No message");
+
+    card.appendChild(details);
+
+    // Agent Actions - Pending Appointments Only
+    if (currentStatus === "PENDING") {
+
+      const approve = document.createElement("button");
+      approve.className = "approve-btn";
+      approve.textContent = "Approve";
+
+      approve.onclick = function () {
+        updateStatus(appointment.appointmentId, "APPROVED");
+      };
+
+      const reject = document.createElement("button");
+      reject.className = "reject-btn";
+      reject.textContent = "Reject";
+
+      reject.onclick = function () {
+        updateStatus(appointment.appointmentId, "REJECTED");
+      };
+
+      card.append(approve, reject);
+    }
+
+    container.appendChild(card);
+  }
+
+
+  // Add Appointment Details
+  function addDetail(parent, label, value) {
+
+    const div = document.createElement("div");
+    div.className = "detail";
+
+    const name = document.createElement("span");
+    name.textContent = label;
+
+    const content = document.createElement("strong");
+    content.textContent = value || "Not available";
+
+    div.append(name, content);
+
+    parent.appendChild(div);
+  }
+
+
+  // Update Appointment Status
+  async function updateStatus(id, status) {
+
+    if (!confirm(
+            "Are you sure you want to " +
+            status.toLowerCase() +
+            " this appointment?"
+    )) {
+      return;
+    }
+
+    const data = new URLSearchParams();
+
+    data.append("appointmentId", id);
+    data.append("status", status);
+
+    try {
+
+      const response = await fetch("/appointment/update-status", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+
+        body: data
+
+      });
+
+      const result = await response.text();
+
+      messageElement.textContent = result;
+
+      const success = result.includes("successfully");
+
+      messageElement.style.color = success
+              ? "#087443"
+              : "#b42318";
+
+      if (success) {
+        await loadAppointments(true);
+      }
+
+    } catch (error) {
+
+      messageElement.textContent =
+              "Request failed. Please try again.";
+
+      messageElement.style.color = "#b42318";
+
+    }
+  }
+
+
+  // Initial Load
+  loadAppointments();
+
+
+  // Automatically Refresh Every 10 Seconds
+  setInterval(function () {
+    loadAppointments();
+  }, 10000);
+
+
+</script>
+
+</body>
+</html>

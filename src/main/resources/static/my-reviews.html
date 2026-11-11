@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Reviews | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        .back-btn {
+            background: #d5b56b;
+            color: #123c2d;
+            padding: 10px 20px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .container {
+            padding: 45px 7%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .page-title {
+            margin-bottom: 30px;
+        }
+
+        .page-title h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .page-title p {
+            color: #777;
+        }
+
+        .review-form,
+        .reviews-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #123c2d;
+            margin-bottom: 22px;
+            font-size: 22px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        select,
+        textarea,
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        select:focus,
+        textarea:focus {
+            border-color: #123c2d;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 8px;
+            font-size: 32px;
+        }
+
+        .stars span {
+            color: #ccc;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .stars span.active {
+            color: #e6ad32;
+        }
+
+        .submit-btn,
+        .refresh-btn {
+            background: #123c2d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .submit-btn:hover,
+        .refresh-btn:hover {
+            background: #d5b56b;
+            color: #123c2d;
+        }
+
+        .review-card {
+            border: 1px solid #eee;
+            padding: 22px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+        }
+
+        .review-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .review-top h3 {
+            color: #123c2d;
+        }
+
+        .rating-display {
+            color: #e6ad32;
+            font-size: 20px;
+        }
+
+        .review-comment {
+            color: #666;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+
+        .review-info {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .PENDING {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .APPROVED {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .REJECTED {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-top: 10px;
+        }
+
+        .edit-btn {
+            background: #d5b56b;
+            color: #123c2d;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+        }
+
+        .message {
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+
+        @media(max-width: 600px) {
+            .container {
+                padding: 30px 5%;
+            }
+
+            .page-title h1 {
+                font-size: 25px;
+            }
+
+            .review-form,
+            .reviews-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <a href="/client-dashboard.html" class="back-btn">Dashboard</a>
+</header>
+
+<div class="container">
+
+    <div class="page-title">
+        <h1>My Reviews</h1>
+        <p>Share your experience and manage your agent reviews.</p>
+    </div>
+
+    <div class="review-form">
+
+        <h2>Write a Review</h2>
+
+        <form id="reviewForm">
+
+            <div class="form-group">
+                <label>Select Agent</label>
+
+                <select id="agentEmail" required>
+                    <option value="">Loading appointments...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Your Rating</label>
+
+                <div class="stars" id="starRating">
+                    <span data-value="1">★</span>
+                    <span data-value="2">★</span>
+                    <span data-value="3">★</span>
+                    <span data-value="4">★</span>
+                    <span data-value="5">★</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Your Comment</label>
+
+                <textarea id="comment"
+                          placeholder="Write your experience..."
+                          required></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                Submit Review
+            </button>
+
+            <div class="message" id="formMessage"></div>
+
+        </form>
+
+    </div>
+
+    <div class="reviews-section">
+
+        <div class="review-top">
+            <h2>My Submitted Reviews</h2>
+
+            <button class="refresh-btn"
+                    onclick="loadReviews()">
+                Refresh Reviews
+            </button>
+        </div>
+
+        <div id="reviewsList">
+            <p class="empty">Loading reviews...</p>
+        </div>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    let selectedRating = 0;
+
+    const stars = document.querySelectorAll("#starRating span");
+
+    stars.forEach(star => {
+
+        star.addEventListener("click", function () {
+
+            selectedRating = Number(this.dataset.value);
+
+            stars.forEach(item => {
+                item.classList.toggle(
+                    "active",
+                    Number(item.dataset.value) <= selectedRating
+                );
+            });
+
+        });
+
+    });
+
+
+    // Load eligible appointments
+    async function loadAppointments() {
+
+        const select = document.getElementById("agentEmail");
+
+        try {
+
+            const response = await fetch("/appointment/my-appointments");
+
+            if (!response.ok) {
+                throw new Error("Could not load appointments.");
+            }
+
+            const appointments = await response.json();
+
+            select.innerHTML = '<option value="">Select an Agent</option>';
+
+            const eligibleAgents = [
+                ...new Set(
+                    appointments
+                        .filter(a =>
+                            ["APPROVED", "COMPLETED"].includes(
+                                String(a.status).toUpperCase()
+                            )
+                        )
+                        .map(a => a.agentEmail)
+                        .filter(Boolean)
+                )
+            ];
+
+            if (eligibleAgents.length === 0) {
+
+                select.innerHTML =
+                    '<option value="">No approved or completed appointments</option>';
+
+                return;
+            }
+
+            eligibleAgents.forEach(email => {
+
+                const option = document.createElement("option");
+
+                option.value = email;
+                option.textContent = email;
+
+                select.appendChild(option);
+
+            });
+
+        } catch (error) {
+
+            select.innerHTML =
+                '<option value="">Unable to load appointments</option>';
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    // Submit Review
+    document.getElementById("reviewForm").addEventListener("submit", async function(e) {
+
+        e.preventDefault();
+
+        const agentEmail = document.getElementById("agentEmail").value;
+        const comment = document.getElementById("comment").value.trim();
+        const message = document.getElementById("formMessage");
+
+        if (!agentEmail) {
+            message.textContent = "Please select an agent.";
+            return;
+        }
+
+        if (selectedRating < 1 || selectedRating > 5) {
+            message.textContent = "Please select a rating.";
+            return;
+        }
+
+        if (!comment) {
+            message.textContent = "Please enter your comment.";
+            return;
+        }
+
+        const data = new URLSearchParams();
+
+        data.append("agentEmail", agentEmail);
+        data.append("rating", selectedRating);
+        data.append("comment", comment);
+
+        try {
+
+            const response = await fetch("/review/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: data
+            });
+
+            const result = await response.text();
+
+            message.textContent = result;
+
+            if (response.ok && /success/i.test(result)) {
+
+                document.getElementById("reviewForm").reset();
+
+                selectedRating = 0;
+
+                stars.forEach(star => {
+                    star.classList.remove("active");
+                });
+
+                loadReviews();
+
+            }
+
+        } catch (error) {
+
+            message.textContent = "Something went wrong. Please try again.";
+            console.error(error);
+
+        }
+
+    });
+
+
+    // Load Client Reviews
+    async function loadReviews() {
+
+        const container = document.getElementById("reviewsList");
+
+        container.innerHTML = '<p class="empty">Loading reviews...</p>';
+
+        try {
+
+            const response = await fetch("/review/my-reviews");
+
+            if (!response.ok) {
+                throw new Error("Could not load reviews.");
+            }
+
+            const reviews = await response.json();
+
+            container.innerHTML = "";
+
+            if (!Array.isArray(reviews) || reviews.length === 0) {
+
+                container.innerHTML =
+                    '<p class="empty">You have not submitted any reviews yet.</p>';
+
+                return;
+            }
+
+            reviews.forEach(review => {
+
+                const card = document.createElement("div");
+
+                card.className = "review-card";
+
+                const rating = Math.max(0, Math.min(5, Number(review.rating) || 0));
+
+                const status = String(review.status || "PENDING").toUpperCase();
+
+                const starsText = "★".repeat(rating) + "☆".repeat(5 - rating);
+
+                card.innerHTML = `
+                    <div class="review-top">
+                        <h3>${escapeHTML(review.agentEmail)}</h3>
+                        <span class="rating-display">${starsText}</span>
+                    </div>
+
+                    <p class="review-comment">${escapeHTML(review.comment)}</p>
+
+                    <p class="review-info">
+                        Review ID: ${escapeHTML(review.reviewId)}
+                        <br>
+                        Date: ${escapeHTML(review.date)}
+                    </p>
+
+                    <span class="status ${status}">
+                        ${escapeHTML(status)}
+                    </span>
+
+                    <br>
+
+                    ${status === "PENDING" ? `
+                        <button class="edit-btn"
+                            onclick="editReview('${escapeHTML(review.reviewId)}',
+                                               ${rating},
+                                               '${escapeHTML(review.comment)}')">
+                            Edit
+                        </button>
+
+                        <button class="delete-btn"
+                            onclick="deleteReview('${escapeHTML(review.reviewId)}')">
+                            Delete
+                        </button>
+                    ` : ""}
+                `;
+
+                container.appendChild(card);
+
+            });
+
+        } catch (error) {
+
+            container.innerHTML =
+                '<p class="empty">Unable to load reviews. Please refresh.</p>';
+
+            console.error(error);
+
+        }
+
+    }
+
+
+    // Edit Review
+    async function editReview(reviewId, oldRating, oldComment) {
+
+        const newRating = prompt(
+            "Enter new rating (1-5):",
+            oldRating
+        );
+
+        if (newRating === null) return;
+
+        const rating = Number(newRating);
+
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+            alert("Please enter a valid rating between 1 and 5.");
+            return;
+        }
+
+        const newComment = prompt(
+            "Enter new review comment:",
+            oldComment
+        );
+
+        if (newComment === null) return;
+
+        if (!newComment.trim()) {
+            alert("Comment cannot be empty.");
+            return;
+        }
+
+        const data = new URLSearchParams();
+
+        data.append("reviewId", reviewId);
+        data.append("rating", rating);
+        data.append("comment", newComment.trim());
+
+        try {
+
+            const response = await fetch("/review/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: data
+            });
+
+            const result = await response.text();
+
+            alert(result);
+
+            if (response.ok && /success/i.test(result)) {
+                loadReviews();
+            }
+
+        } catch (error) {
+
+            alert("Unable to update review.");
+            console.error(error);
+
+        }
+
+    }
+
+
+    // Delete Review
+    async function deleteReview(reviewId) {
+
+        if (!confirm("Are you sure you want to delete this review?")) {
+            return;
+        }
+
+        const data = new URLSearchParams();
+
+        data.append("reviewId", reviewId);
+
+        try {
+
+            const response = await fetch("/review/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: data
+            });
+
+            const result = await response.text();
+
+            alert(result);
+
+            if (response.ok && /success/i.test(result)) {
+                loadReviews();
+            }
+
+        } catch (error) {
+
+            alert("Unable to delete review.");
+            console.error(error);
+
+        }
+
+    }
+
+
+    // Prevent HTML injection in displayed data
+    function escapeHTML(value) {
+
+        return String(value ?? "").replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+
+    }
+
+
+    // Initial loading
+    loadAppointments();
+    loadReviews();
+
+</script>
+
+</body>
+</html>ml>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Properties | EstatePro</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <div class="header-links">
+        <a href="/admin-dashboard.html">Dashboard</a>
+        <a href="/logout">Logout</a>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Manage Properties</h1>
+    <p class="subtitle">View every property listing and remove unsuitable ones.</p>
+
+    <div id="message"></div>
+    <div class="table-box" id="tableBox">Loading...</div>
+</div>
+
+<script src="/admin.js"></script>
+<script>
+
+    const box = document.getElementById("tableBox");
+
+    async function loadProperties() {
+
+        try {
+
+            const properties = await getList("/admin/properties");
+
+            if (properties.length === 0) {
+                showEmpty(box, "No properties found.");
+                return;
+            }
+
+            buildTable(box,
+                ["ID", "Title", "Type", "Listing", "Location", "Price (Rs.)", "Agent", "Action"],
+                properties,
+                function (row, property) {
+
+                    makeCell(row, property.propertyId);
+                    makeCell(row, property.title);
+                    makeCell(row, property.propertyType);
+                    makeCell(row, property.listingType);
+                    makeCell(row, property.location);
+                    makeCell(row, Number(property.price).toLocaleString());
+                    makeCell(row, property.agentEmail);
+
+                    const actionCell = document.createElement("td");
+
+                    actionCell.appendChild(makeButton("Delete", "red-btn", function () {
+                        deleteProperty(property.propertyId);
+                    }));
+
+                    row.appendChild(actionCell);
+                });
+
+        } catch (error) {
+            showEmpty(box, error.message);
+        }
+    }
+
+    async function deleteProperty(propertyId) {
+
+        if (!confirm("Delete property " + propertyId + "?")) {
+            return;
+        }
+
+        const result = await postForm("/admin/delete-property", { propertyId: propertyId });
+
+        showMessage(result, result.includes("successfully"));
+        loadProperties();
+    }
+
+    loadProperties();
+
+</script>
+</body>
+</html>

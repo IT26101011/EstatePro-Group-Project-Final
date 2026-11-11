@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        header {
+            background: #123c2d;
+            color: white;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: #d5b56b;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #123c2d;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #1d704c;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #123c2d;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d704c;
+        }
+
+        #message {
+            margin-top: 18px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Estate<span>Pro.</span></div>
+    <a href="/agent-dashboard.html">← Dashboard</a>
+</header>
+
+<div class="container">
+
+    <div class="form-card">
+
+        <h1>Update Agent Profile</h1>
+
+        <p class="subtitle">
+            Update your professional information.
+        </p>
+
+        <form id="updateForm">
+
+            <div class="form-group">
+                <label>Agency Name</label>
+                <input type="text" id="agencyName" name="agencyName" required>
+            </div>
+
+            <div class="form-group">
+                <label>Specialization</label>
+                <input type="text" id="specialization" name="specialization" required>
+            </div>
+
+            <div class="form-group">
+                <label>Location</label>
+                <input type="text" id="location" name="location" required>
+            </div>
+
+            <div class="form-group">
+                <label>Experience (Years)</label>
+                <input type="number" id="experienceYears" name="experienceYears" min="0" required>
+            </div>
+
+            <div class="form-group">
+                <label>Professional Description</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+
+            <button type="submit">Save Changes</button>
+
+        </form>
+
+        <p id="message"></p>
+
+    </div>
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    async function loadProfile() {
+
+        const message = document.getElementById("message");
+
+        try {
+
+            const response = await fetch("/agent/my-profile");
+
+            if (!response.ok) {
+                throw new Error("Unable to load profile.");
+            }
+
+            const result = await response.json();
+
+            if (!result.agentId) {
+                throw new Error("Agent profile not found.");
+            }
+
+            document.getElementById("agencyName").value = result.agencyName || "";
+            document.getElementById("specialization").value = result.specialization || "";
+            document.getElementById("location").value = result.location || "";
+            document.getElementById("experienceYears").value = result.experienceYears ?? 0;
+            document.getElementById("description").value = result.description || "";
+
+        } catch (error) {
+
+            message.style.color = "red";
+            message.textContent = error.message;
+
+        }
+    }
+
+    document.getElementById("updateForm").addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const formData = new FormData(this);
+        const data = new URLSearchParams(formData);
+
+        const message = document.getElementById("message");
+
+        try {
+
+            const response = await fetch("/agent/update-profile", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: data
+            });
+
+            const result = await response.text();
+
+            message.style.color = result.includes("successfully") ? "green" : "red";
+            message.textContent = result;
+
+        } catch (error) {
+
+            message.style.color = "red";
+            message.textContent = "Something went wrong. Please try again.";
+
+        }
+
+    });
+
+    loadProfile();
+
+</script>
+
+</body>
+</html>

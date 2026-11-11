@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>My Reviews | EstatePro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background: #f5f7f5;
+            color: #18352b;
+        }
+
+        /* Header */
+
+        header {
+            background: #123c2d;
+            padding: 22px 7%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: #d5b56b;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .back-btn {
+            background: #d5b56b;
+            color: #123c2d;
+            text-decoration: none;
+            padding: 11px 20px;
+            border-radius: 7px;
+            font-weight: 700;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* Main Container */
+
+        .container {
+            padding: 55px 7%;
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .heading {
+            margin-bottom: 30px;
+        }
+
+        .heading h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .heading p {
+            color: #718078;
+            font-size: 15px;
+        }
+
+        /* Average Rating */
+
+        .rating-card {
+            background: #123c2d;
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 5px 18px rgba(18, 60, 45, 0.12);
+        }
+
+        .rating-card h3 {
+            color: #d5b56b;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .rating-value {
+            font-size: 42px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .stars {
+            color: #d5b56b;
+            font-size: 25px;
+            letter-spacing: 3px;
+        }
+
+        /* Reviews */
+
+        .section-title {
+            font-size: 23px;
+            margin-bottom: 22px;
+            font-weight: 800;
+        }
+
+        .review-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 22px;
+        }
+
+        .review-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            border: 1px solid #edf0ed;
+            transition: 0.3s;
+        }
+
+        .review-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 22px rgba(18, 60, 45, 0.09);
+        }
+
+        .review-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .client-email {
+            font-size: 15px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .review-date {
+            color: #89968e;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .review-rating {
+            color: #d5b56b;
+            font-size: 19px;
+            letter-spacing: 2px;
+        }
+
+        .review-comment {
+            color: #64736a;
+            font-size: 15px;
+            line-height: 1.7;
+            border-top: 1px solid #edf0ed;
+            padding-top: 16px;
+        }
+
+        /* Empty Message */
+
+        .empty-message {
+            background: white;
+            padding: 45px 20px;
+            text-align: center;
+            border-radius: 12px;
+            color: #718078;
+            grid-column: 1 / -1;
+        }
+
+        .empty-message h3 {
+            color: #18352b;
+            margin-bottom: 8px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Footer */
+
+        footer {
+            background: #123c2d;
+            color: #d5b56b;
+            text-align: center;
+            padding: 20px;
+            margin-top: 50px;
+            font-size: 13px;
+        }
+
+        @media(max-width: 600px) {
+            header {
+                padding: 18px 5%;
+            }
+
+            .container {
+                padding: 35px 5%;
+            }
+
+            .heading h1 {
+                font-size: 26px;
+            }
+
+            .rating-card {
+                padding: 23px;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<header>
+    <div class="logo">EstatePro.</div>
+
+
+    <a href="/agent-dashboard.html" class="back-btn">
+        ← Dashboard
+    </a>
+
+
+</header>
+
+<div class="container">
+
+
+    <div class="heading">
+        <h1>My Reviews</h1>
+        <p>View feedback and ratings from your clients.</p>
+    </div>
+
+    <div id="message" class="message error"></div>
+
+    <div class="rating-card">
+        <h3>Your Average Rating</h3>
+
+        <div class="rating-value" id="averageRating">
+            0.00 / 5.00
+        </div>
+
+        <div class="stars" id="averageStars">
+            ☆☆☆☆☆
+        </div>
+    </div>
+
+    <h2 class="section-title">Client Feedback</h2>
+
+    <div id="reviewList" class="review-list">
+        <div class="empty-message">
+            Loading reviews...
+        </div>
+    </div>
+
+
+</div>
+
+<footer>
+    © 2026 EstatePro. All Rights Reserved.
+</footer>
+
+<script>
+
+    async function loadReviews() {
+
+        const reviewList = document.getElementById("reviewList");
+        const message = document.getElementById("message");
+
+        try {
+
+            const response = await fetch("/review/agent-reviews");
+
+            if (!response.ok) {
+                throw new Error("Unable to load reviews. Please login as an agent.");
+            }
+
+            const reviews = await response.json();
+
+            if (!Array.isArray(reviews)) {
+                throw new Error("Invalid review data received.");
+            }
+
+            let totalRating = 0;
+
+            reviews.forEach(review => {
+                totalRating += Number(review.rating);
+            });
+
+            const average = reviews.length > 0
+                ? totalRating / reviews.length
+                : 0;
+
+            document.getElementById("averageRating").textContent =
+                average.toFixed(2) + " / 5.00";
+
+            document.getElementById("averageStars").textContent =
+                "★".repeat(Math.round(average)) +
+                "☆".repeat(5 - Math.round(average));
+
+            if (reviews.length === 0) {
+
+                reviewList.innerHTML = `
+                    <div class="empty-message">
+                        <h3>No Reviews Yet</h3>
+                        <p>Approved client reviews will appear here.</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            reviewList.innerHTML = "";
+
+            reviews.forEach(review => {
+
+                const rating = Number(review.rating);
+
+                const stars =
+                    "★".repeat(rating) +
+                    "☆".repeat(5 - rating);
+
+                const card = document.createElement("div");
+                card.className = "review-card";
+
+                const top = document.createElement("div");
+                top.className = "review-top";
+
+                const clientInfo = document.createElement("div");
+
+                const email = document.createElement("div");
+                email.className = "client-email";
+                email.textContent = review.clientEmail || "Client";
+
+                const date = document.createElement("div");
+                date.className = "review-date";
+                date.textContent = review.date || "";
+
+                clientInfo.appendChild(email);
+                clientInfo.appendChild(date);
+
+                const ratingElement = document.createElement("div");
+                ratingElement.className = "review-rating";
+                ratingElement.textContent = stars;
+
+                top.appendChild(clientInfo);
+                top.appendChild(ratingElement);
+
+                const comment = document.createElement("p");
+                comment.className = "review-comment";
+                comment.textContent = review.comment || "";
+
+                card.appendChild(top);
+                card.appendChild(comment);
+
+                reviewList.appendChild(card);
+
+            });
+
+        } catch (error) {
+
+            message.textContent = error.message;
+            message.style.display = "block";
+
+            reviewList.innerHTML = `
+                <div class="empty-message">
+                    Unable to display reviews.
+                </div>
+            `;
+        }
+    }
+
+    loadReviews();
+
+</script>
+
+</body>
+</html>
