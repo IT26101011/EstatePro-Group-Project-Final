@@ -15,8 +15,9 @@ public class UserService {
     private final UserRepository userRepository = new UserRepository();
 
     // Register a new user
-    public String registerUser(User user) {
+    public String registerUser(User user) {//CREATE
 
+        // Check empty fields
         if (user.getFullName() == null || user.getFullName().isBlank() ||
                 user.getEmail() == null || user.getEmail().isBlank() ||
                 user.getPhone() == null || user.getPhone().isBlank() ||
@@ -26,25 +27,46 @@ public class UserService {
             return "Please fill all fields.";
         }
 
-        if (!user.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+        // Remove unnecessary spaces
+        String email = user.getEmail().trim();
+        String phone = user.getPhone().trim();
+
+        // Validate email format
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             return "Invalid email address.";
         }
 
+        // Validate phone number (exactly 10 digits)
+        if (!phone.matches("\\d{10}")) {
+            return "Phone number must contain exactly 10 digits.";
+        }
+
+        // Validate password
         if (user.getPassword().length() < 8) {
             return "Password must contain at least 8 characters.";
         }
 
+        // Validate account type
         if (!user.getRole().equals("CLIENT") &&
                 !user.getRole().equals("AGENT")) {
 
             return "Invalid account type.";
         }
 
-        if (userRepository.emailExists(user.getEmail())) {
+        // Check duplicate email
+        if (userRepository.emailExists(email)) {
             return "Email already registered.";
         }
 
+        // Check duplicate phone number
+        if (userRepository.phoneExists(phone)) {
+            return "Phone number already registered.";
+        }
+
         try {
+            user.setEmail(email);
+            user.setPhone(phone);
+            user.setFullName(user.getFullName().trim());
 
             String hashedPassword = hashPassword(user.getPassword());
 
