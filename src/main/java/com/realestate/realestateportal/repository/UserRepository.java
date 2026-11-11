@@ -14,7 +14,7 @@ public class UserRepository {
     private static final String FILE_PATH = "data/users.txt";
 
     // Save a new user
-    public boolean saveUser(User user) {//CREATE
+    public boolean saveUser(User user) {
 
         try {
             File file = new File(FILE_PATH);
@@ -49,57 +49,23 @@ public class UserRepository {
         }
     }
 
-
     // Check whether email already exists
     public boolean emailExists(String email) {
-
-        if (email == null || email.isBlank()) {
-            return false;
-        }
-
-        return findByEmail(email.trim()) != null;
-    }
-
-    // Check whether phone number already exists
-    public boolean phoneExists(String phone) {
-
-        if (phone == null || phone.isBlank()) {
-            return false;
-        }
-
-        String normalizedPhone = phone.trim();
-
-        for (User user : getAllUsers()) {
-
-            if (user.getPhone() != null &&
-                    user.getPhone().trim().equals(normalizedPhone)) {
-                return true;
-            }
-        }
-
-        return false;
+        return findByEmail(email) != null;
     }
 
     // Find user by email
     public User findByEmail(String email) {
 
-        if (email == null || email.isBlank()) {
-            return null;
-        }
-
-        String normalizedEmail = email.trim();
-
         for (User user : getAllUsers()) {
 
-            if (user.getEmail() != null &&
-                    user.getEmail().trim().equalsIgnoreCase(normalizedEmail)) {
+            if (user.getEmail().equalsIgnoreCase(email)) {
                 return user;
             }
         }
 
         return null;
     }
-
 
     // Get All Users
     public List<User> getAllUsers() {
