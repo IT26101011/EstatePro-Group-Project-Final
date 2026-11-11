@@ -15,10 +15,13 @@ import java.util.List;
 
 public class ReviewRepository {
 
+    // Encapsulation:
+
     private static final String FILE_PATH = "data/reviews.txt";
     private static final String SEPARATOR = "|";
 
-    // Constructor
+    // Constructor (Initializes the repository by creating)
+    // the data directory and reviews file if they do not exist.
     public ReviewRepository() {
         try {
             Path directory = Paths.get("data");
@@ -54,6 +57,8 @@ public class ReviewRepository {
                 StandardOpenOption.CREATE,
                 StandardOpenOption.APPEND)) {
 
+            // Obj interaction:Uses the Review object
+            // and getter methods to retrieve review data.
             writer.write(convertToLine(review));
             writer.newLine();
 
@@ -68,6 +73,8 @@ public class ReviewRepository {
     // Read - Get All Reviews
     public List<Review> getAllReviews() {
 
+        // Obj creation (Creates an ArrayList object
+        // to store the retrieved Review objects.)
         List<Review> reviews = new ArrayList<>();
 
         try (BufferedReader reader = Files.newBufferedReader(
@@ -82,6 +89,7 @@ public class ReviewRepository {
                     continue;
                 }
 
+                //obj cre: Converts text to review obj
                 Review review = convertToReview(line);
 
                 if (review != null) {
@@ -104,6 +112,7 @@ public class ReviewRepository {
             return null;
         }
 
+        // OBJ interaction Accesses Review objects by getter methods.
         for (Review review : getAllReviews()) {
 
             if (review.getReviewId().equals(reviewId)) {
@@ -117,6 +126,8 @@ public class ReviewRepository {
     // Find Reviews By Agent Email
     public List<Review> findByAgentEmail(String email) {
 
+        // Obj creation ; Creates a list to store
+        // Review objects belonging to a particular agent.
         List<Review> result = new ArrayList<>();
 
         if (email == null) {
@@ -203,6 +214,8 @@ public class ReviewRepository {
     }
 
     // Rewrite File
+    // ABs (Hides the internal file-writing process)
+    // inside a private helper method.
     private void rewriteFile(List<Review> reviews) {
 
         try (BufferedWriter writer = Files.newBufferedWriter(
@@ -223,6 +236,8 @@ public class ReviewRepository {
     }
 
     // Convert Review Object To Text Line
+    // Abs: Hides the conversion process
+    // from the other methods in this class.
     private String convertToLine(Review review) {
 
         String[] values = {
@@ -251,6 +266,8 @@ public class ReviewRepository {
     }
 
     // Convert Text Line To Review Object
+    // Obj creation; Creates a Review object using Parameterize construcror
+
     private Review convertToReview(String line) {
 
         String[] data = line.split("\\|", -1);
