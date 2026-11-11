@@ -6,6 +6,7 @@ import com.realestate.realestateportal.model.User;
 import com.realestate.realestateportal.service.AgentManagement;
 import com.realestate.realestateportal.service.AgentService;
 import com.realestate.realestateportal.exception.InvalidAgentDataException;
+import com.realestate.realestateportal.algorithm.AgentSelectionSort;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -19,6 +20,10 @@ public class AgentController {
 
     // Polymorphism - Interface reference
     private final AgentManagement agentService = new AgentService();
+
+    // Selection Sort object
+    private final AgentSelectionSort selectionSort =
+            new AgentSelectionSort();
 
     // Create Agent Profile
     @PostMapping("/create-profile")
@@ -86,7 +91,7 @@ public class AgentController {
         return agentService.updateAgentProfile(updatedAgent);
     }
 
-    // Get All Agent Profiles
+    // Get All Agent Profiles Sorted by Rating
     @GetMapping("/all")
     public Object getAllAgents(HttpSession session) {
 
@@ -98,8 +103,12 @@ public class AgentController {
 
         List<Agent> agents = agentService.getAllAgents();
 
+        // Sort agents from highest rating to lowest rating
+        selectionSort.sortByRating(agents);
+
         return agents;
     }
+
     // Delete Own Agent Profile and User Account
     @DeleteMapping("/my-profile")
     public String deleteMyProfile(HttpSession session) {
@@ -126,6 +135,7 @@ public class AgentController {
 
         return result;
     }
+
     // Delete Agent Profile - Admin Only
     @DeleteMapping("/{agentId}")
     public String deleteAgent(
